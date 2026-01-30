@@ -7,6 +7,7 @@ import PaperTradeTerminal from '@/components/paper-trading/PaperTradeTerminal';
 import AITradingCoach from '@/components/paper-trading/AITradingCoach';
 import PaperPortfolio from '@/components/paper-trading/PaperPortfolio';
 import GamificationPanel from '@/components/paper-trading/GamificationPanel';
+import TradingViewBondChart from '@/components/paper-trading/TradingViewBondChart';
 import { Menu, Zap, BookOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,42 +53,43 @@ export default function PaperTradingPage() {
                     </div>
                 </header>
 
-                <main className="p-4 lg:p-6 space-y-6">
+                <main className="p-4 lg:p-6 space-y-4 h-[calc(100vh-80px)] overflow-hidden flex flex-col">
                     {/* Top Stats Strip (Risk Meter & Balance) */}
-                    <PaperWalletOverview />
+                    <div className="shrink-0">
+                        <PaperWalletOverview />
+                    </div>
 
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    <div className="flex-1 grid grid-cols-12 gap-4 min-h-0">
+                        {/* LEFT COLUMN: Market Watch (2/12) */}
+                        <div className="col-span-2 flex flex-col gap-4 overflow-hidden">
+                            <PracticeMarketplace />
+                        </div>
 
-                        {/* LEFT COLUMN: Market & Charts (7 cols) */}
-                        <div className="xl:col-span-8 space-y-6">
-
-                            {/* Market Chart / Marketplace */}
-                            <div className="h-[500px] w-full">
-                                <PracticeMarketplace />
+                        {/* CENTER COLUMN: Chart & Depth (7/12) */}
+                        <div className="col-span-7 flex flex-col gap-4 overflow-hidden">
+                            {/* TradingView Chart */}
+                            <div className="flex-1 h-[400px]">
+                                <TradingViewBondChart />
                             </div>
-
-                            {/* Portfolio Holdings & History */}
-                            <div className="min-h-[300px]">
-                                <PaperPortfolio />
+                            {/* Depth / Order Book */}
+                            <div className="h-[200px] bg-slate-900/50 border border-white/5 rounded-2xl relative overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center text-slate-500 font-bold">
+                                    Market Depth
+                                </div>
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: Action & Coaching (5 cols) */}
-                        <div className="xl:col-span-4 space-y-6">
-
-                            {/* Trade Terminal (Buy/Sell) */}
+                        {/* RIGHT COLUMN: Action & Coaching (3/12) */}
+                        <div className="col-span-3 flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-2">
                             <PaperTradeTerminal />
-
-                            {/* AI Coach */}
-                            <div className="min-h-[250px]">
-                                <AITradingCoach />
-                            </div>
-
-                            {/* Gamification / Leaderboard */}
+                            <AITradingCoach />
                             <GamificationPanel />
-
                         </div>
+                    </div>
 
+                    {/* BOTTOM: Portfolio (Collapsible or Fixed) */}
+                    <div className="shrink-0 h-[200px]">
+                        <PaperPortfolio />
                     </div>
                 </main>
             </div>
