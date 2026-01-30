@@ -38,7 +38,15 @@ function TradingChart() {
       }`;
 
         container.current.appendChild(script);
-    }, [selectedBond.tvSymbol]);
+    }, [selectedBond?.tvSymbol]);
+
+    if (!selectedBond) {
+        return (
+            <div className="glass-panel p-1 rounded-2xl border border-white/5 bg-[#0a111e]/50 backdrop-blur-md flex flex-col h-full items-center justify-center text-slate-500 text-xs">
+                Select a bond to view chart
+            </div>
+        );
+    }
 
     return (
         <div className="glass-panel p-1 rounded-2xl border border-white/5 bg-[#0a111e]/50 backdrop-blur-md flex flex-col h-full overflow-hidden">

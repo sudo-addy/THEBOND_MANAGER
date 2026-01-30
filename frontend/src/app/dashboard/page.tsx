@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Search, LogOut, Bell, Menu, Users, Activity, Database, ShieldAlert, Award } from 'lucide-react';
 
 // Components
-import Sidebar from '@/components/dashboard/Sidebar';
-import InvestorOverviewHeader from '@/components/dashboard/InvestorOverviewHeader';
+import NavigationSidebarPro from '@/components/dashboard/NavigationSidebarPro';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import InvestorOverviewCards from '@/components/dashboard/InvestorOverviewCards';
 import PortfolioPerformanceChart from '@/components/dashboard/PortfolioPerformanceChart';
 import EnhancedAIRecommendations from '@/components/dashboard/EnhancedAIRecommendations';
 import HoldingsTable from '@/components/dashboard/HoldingsTable';
@@ -55,7 +56,7 @@ export default function DashboardPage() {
         <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-amber-900/5 rounded-full blur-[100px]" />
       </div>
 
-      <Sidebar />
+      <NavigationSidebarPro />
 
       <div className="lg:pl-64 flex flex-col min-h-screen relative z-10">
 
@@ -63,41 +64,8 @@ export default function DashboardPage() {
         {!isAdmin && <MarketPulseTicker />}
 
         {/* Header / Nav */}
-        <header className="px-6 py-4 flex items-center justify-between sticky top-0 bg-[#050b14]/80 backdrop-blur-xl z-30 border-b border-white/5">
-          <div className="lg:hidden">
-            <Menu className="w-6 h-6 text-white" />
-          </div>
-
-          <div className="hidden lg:block text-sm text-slate-400">
-            {isAdmin ? (
-              <span className="text-red-400 font-bold uppercase tracking-wider">System Admin Console</span>
-            ) : (
-              <>Global Market Status: <span className="text-green-400 font-bold">Open</span></>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4">
-            {!isAdmin && (
-              <div className="relative hidden md:block">
-                <input
-                  type="text"
-                  placeholder="Search bonds, ISIN..."
-                  className="bg-slate-900/50 border border-slate-800 rounded-lg pl-9 pr-4 py-1.5 text-sm focus:border-blue-500 focus:outline-none w-64 text-white"
-                />
-                <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2" />
-              </div>
-            )}
-
-            <button className="p-2 text-slate-400 hover:text-white transition relative">
-              <Bell className="w-5 h-5" />
-              {isAdmin && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#050b14]" />}
-            </button>
-
-            <button onClick={() => { localStorage.clear(); router.push('/login'); }} className="lg:hidden text-slate-400">
-              <LogOut className="w-5 h-5" />
-            </button>
-          </div>
-        </header>
+        {/* Header / Nav */}
+        <DashboardHeader />
 
         <main className="p-6 space-y-6">
 
@@ -166,8 +134,7 @@ export default function DashboardPage() {
           {/* ================= INSTITUTION VIEW ================= */}
           {isInstitution && (
             <div className="animate-in fade-in slide-in-from-bottom-4">
-              <InvestorOverviewHeader
-                user={user}
+              <InvestorOverviewCards
                 portfolioValue={portfolioData.total_value}
                 walletBalance={portfolioData.wallet_balance}
                 dailyPnL={portfolioData.daily_pnl}
@@ -194,8 +161,7 @@ export default function DashboardPage() {
           {/* ================= RETAIL VIEW (Default) ================= */}
           {isRetail && (
             <div className="animate-in fade-in slide-in-from-bottom-4">
-              <InvestorOverviewHeader
-                user={user}
+              <InvestorOverviewCards
                 portfolioValue={portfolioData.total_value}
                 walletBalance={portfolioData.wallet_balance}
                 dailyPnL={portfolioData.daily_pnl}
@@ -243,6 +209,6 @@ export default function DashboardPage() {
 
         </main>
       </div>
-    </div>
+    </div >
   );
 }

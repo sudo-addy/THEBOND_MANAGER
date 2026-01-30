@@ -13,15 +13,15 @@ router.get('/', async (req, res) => {
     // Create a unique cache key based on query params
     const cacheKey = `bonds:list:${JSON.stringify(req.query)}`;
 
-    // Try to fetch from cache
+    // Try to fetch from cache (Safe wrapper handles connection state)
     try {
       const cachedData = await redisClient.get(cacheKey);
       if (cachedData) {
         return res.json(JSON.parse(cachedData));
       }
     } catch (err) {
-      console.error('Redis error:', err);
-      // Fallback to DB if cache fails
+      // Wrapper suppresses connection errors, so this catches other JSON parsing errors etc.
+      console.warn('Cache fetch skipped:', err.message);
     }
 
     let query = { status: 'active' };
