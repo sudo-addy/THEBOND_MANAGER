@@ -14,21 +14,23 @@ import HoldingsTable from '@/components/dashboard/HoldingsTable';
 import MarketPulseTicker from '@/components/dashboard/MarketPulseTicker';
 import TokenizationTracker from '@/components/dashboard/TokenizationTracker';
 import SmartAlertsCenter from '@/components/dashboard/SmartAlertsCenter';
+import PaymentModal from '@/components/dashboard/PaymentModal';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(45200); // Initial mock balance
 
-  // Mock Data
+  // Mock Data (Static parts)
   const portfolioData = {
     total_value: 4520000,
     total_invested: 4000000,
     current_value: 4520000,
     current_gains: 520000,
     gain_percentage: 13.0,
-    wallet_balance: 45200,   // NEW
-    daily_pnl: 2.4           // NEW
+    daily_pnl: 2.4
   };
 
   useEffect(() => {
@@ -50,6 +52,17 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#050b14] text-slate-200 font-sans selection:bg-amber-500/30">
 
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        onSuccess={(newBalance) => {
+          // In a real app, backend would update value, but here we simulate local update if backend response doesn't
+          setWalletBalance(newBalance || (walletBalance + 5000)); // Fallback if no newBalance returned
+          setIsPaymentModalOpen(false);
+        }}
+      />
+
       {/* Background Ambience */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-900/10 rounded-full blur-[120px]" />
@@ -63,7 +76,6 @@ export default function DashboardPage() {
         {/* Top Ticker - Global Pro Feature */}
         {!isAdmin && <MarketPulseTicker />}
 
-        {/* Header / Nav */}
         {/* Header / Nav */}
         <DashboardHeader />
 
@@ -136,7 +148,7 @@ export default function DashboardPage() {
             <div className="animate-in fade-in slide-in-from-bottom-4">
               <InvestorOverviewCards
                 portfolioValue={portfolioData.total_value}
-                walletBalance={portfolioData.wallet_balance}
+                walletBalance={walletBalance}
                 dailyPnL={portfolioData.daily_pnl}
               />
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
@@ -163,7 +175,7 @@ export default function DashboardPage() {
             <div className="animate-in fade-in slide-in-from-bottom-4">
               <InvestorOverviewCards
                 portfolioValue={portfolioData.total_value}
-                walletBalance={portfolioData.wallet_balance}
+                walletBalance={walletBalance}
                 dailyPnL={portfolioData.daily_pnl}
               />
 
@@ -185,7 +197,10 @@ export default function DashboardPage() {
                       <button onClick={() => router.push('/bonds')} className="col-span-2 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-900/20 transition flex items-center justify-center gap-2">
                         Start Investing <Search className="w-3 h-3" />
                       </button>
-                      <button className="py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl font-bold text-xs border border-slate-700 transition">
+                      <button
+                        onClick={() => setIsPaymentModalOpen(true)}
+                        className="py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl font-bold text-xs border border-slate-700 transition"
+                      >
                         Add Money
                       </button>
                       <button className="py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl font-bold text-xs border border-slate-700 transition">
