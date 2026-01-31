@@ -94,8 +94,8 @@ export default function SignupPage() {
 
         <div className="relative z-10">
           <Link href="/" className="inline-flex items-center gap-2 text-white mb-12 hover:opacity-80 transition">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold">B</div>
-            <span className="text-xl font-bold">BondPlatform</span>
+            <img src="/logo.png" alt="MUD₹A Logo" className="w-8 h-8 rounded-lg" />
+            <span className="text-xl font-bold">MUD₹A</span>
           </Link>
 
           <h1 className="text-4xl font-bold text-white mb-6 leading-tight">

@@ -107,7 +107,7 @@ export default function AITradingCoach() {
                     disabled={loading}
                 />
                 <Sparkles className="w-3 h-3 text-slate-500 absolute right-3 top-7" />
-                <p className="text-[9px] text-slate-500 mt-1 text-center">Powered by OpenAI & BondPlatform Intelligence</p>
+                <p className="text-[9px] text-slate-500 mt-1 text-center">Powered by OpenAI & MUD₹A Intelligence</p>
             </div>
 
         </div>

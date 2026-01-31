@@ -2,7 +2,7 @@
 
 import { Sparkles, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Cell } from 'recharts';
+import RiskYieldScatterChart from '../charts/RiskYieldScatterChart';
 
 export default function EnhancedAIRecommendations() {
     const router = useRouter();
@@ -50,20 +50,9 @@ export default function EnhancedAIRecommendations() {
                 </div>
 
                 {/* Chart Area */}
-                <div className="h-48 bg-slate-900/50 rounded-xl border border-white/5 p-2 relative">
-                    <p className="absolute top-2 left-2 text-[10px] text-slate-500 font-bold uppercase">Risk (X) vs Yield (Y)</p>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-                            <XAxis type="number" dataKey="x" name="Risk" hide />
-                            <YAxis type="number" dataKey="y" name="Yield" hide />
-                            <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', fontSize: '12px' }} />
-                            <Scatter name="Bonds" data={data} fill="#8884d8">
-                                {data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                                ))}
-                            </Scatter>
-                        </ScatterChart>
-                    </ResponsiveContainer>
+                <div className="h-64 bg-slate-900/50 rounded-xl border border-white/5 p-4 relative">
+                    <p className="absolute top-2 left-2 text-[10px] text-slate-500 font-bold uppercase z-10">Risk (X) vs Yield (Y)</p>
+                    <RiskYieldScatterChart data={data} />
                 </div>
             </div>
         </div>

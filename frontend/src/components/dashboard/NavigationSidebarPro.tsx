@@ -60,9 +60,7 @@ export default function NavigationSidebarPro() {
                 {/* Logo Area */}
                 <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-[#020617]/50 backdrop-blur-md">
                     <Link href="/dashboard" className="font-bold text-xl tracking-tight text-white flex items-center gap-2 hover:opacity-80 transition">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]">
-                            <span className="font-bold">B</span>
-                        </div>
+                        <img src="/logo.png" alt="MUD₹A Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.5)]" />
                         <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">BondPlatform</span>
                     </Link>
                 </div>

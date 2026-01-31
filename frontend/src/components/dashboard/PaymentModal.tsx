@@ -160,7 +160,7 @@ export default function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModa
                                         </div>
 
                                         <div className="bg-white p-4 rounded-xl inline-block mx-auto">
-                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=bondplatform@upi&pn=BondPlatform&am=${amount}&cu=INR`} alt="Payment QR" className="w-32 h-32" />
+                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=mudra@upi&pn=MUDRA&am=${amount}&cu=INR`} alt="Payment QR" className="w-32 h-32" />
                                         </div>
                                         <div>
                                             <p className="text-sm text-slate-300 font-medium mb-1">Scan to Pay with Any UPI App</p>

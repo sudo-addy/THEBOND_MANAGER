@@ -19,13 +19,13 @@ export default function LoginPage() {
   const handleDemoLogin = (type: 'retail' | 'institution' | 'admin') => {
     setActiveTab(type);
     if (type === 'retail') {
-      setEmail('basic@bondplatform.demo');
+      setEmail('basic@mudra.demo');
       setPassword('Basic@CIH2026');
     } else if (type === 'institution') {
-      setEmail('premium@bondplatform.demo');
+      setEmail('premium@mudra.demo');
       setPassword('Premium@CIH2026');
     } else {
-      setEmail('admin@bondplatform.demo');
+      setEmail('admin@mudra.demo');
       setPassword('Admin@CIH2026');
     }
   };
@@ -66,8 +66,8 @@ export default function LoginPage() {
         {/* Header Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition">
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">B</div>
-            <span className="text-2xl font-bold text-white tracking-tight">BondPlatform</span>
+            <img src="/logo.png" alt="MUD₹A Logo" className="w-10 h-10 rounded-xl shadow-lg" />
+            <span className="text-2xl font-bold text-white tracking-tight">MUD₹A</span>
           </Link>
           <h2 className="text-lg text-blue-100">
             Welcome back, <span className="font-semibold text-white">Investor</span>

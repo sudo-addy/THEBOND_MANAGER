@@ -33,8 +33,8 @@ export default function Sidebar() {
                 {/* Logo Area */}
                 <div className="h-16 flex items-center px-6 border-b border-white/5">
                     <div className="font-bold text-xl tracking-tight text-white flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center text-white">B</div>
-                        BondPlatform
+                        <img src="/logo.png" alt="MUD₹A Logo" className="w-8 h-8 rounded-lg" />
+                        MUD₹A
                     </div>
                 </div>
 
@@ -92,7 +92,7 @@ export default function Sidebar() {
                         </div>
                         <div className="flex-1">
                             <p className="text-sm font-bold text-white">Premium Investor</p>
-                            <p className="text-xs text-slate-500">premium@bondplatform.demo</p>
+                            <p className="text-xs text-slate-500">premium@mudra.demo</p>
                         </div>
                     </div>
                 </div>

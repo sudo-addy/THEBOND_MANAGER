@@ -10,6 +10,7 @@ import { FeaturedProjects } from '../components/landing/FeaturedProjects';
 import { TokenizationExplainer } from '../components/landing/TokenizationExplainer';
 import { ImpactDashboard } from '../components/landing/ImpactDashboard';
 import { PricingSection } from '../components/landing/PricingSection';
+import { SaturnRing } from '../components/animations/SaturnRing';
 
 
 // Animation variants
@@ -60,8 +61,8 @@ export default function Home() {
       <nav className="fixed top-0 left-0 w-full bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl z-50 border-b border-slate-200/50 dark:border-slate-800/50 transition-colors duration-300 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-950/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">B</div>
-            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">BondPlatform</span>
+            <img src="/logo.png" alt="MUD₹A Logo" className="w-8 h-8 rounded-lg" />
+            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">MUD₹A</span>
           </div>
           <div className="flex space-x-6 items-center">
             <div className="hidden md:flex space-x-8 items-center">
@@ -136,44 +137,46 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="relative hidden md:block"
           >
-            <div className="relative z-10 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 p-6 max-w-md mx-auto transform rotate-2 hover:rotate-0 transition duration-500">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Total Value Locked</p>
-                  <h3 className="text-2xl font-bold dark:text-white transition-all duration-500">{currentTvl}</h3>
-                </div>
-                <div className="text-green-500 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full text-sm font-bold">
-                  +12.5% 📈
-                </div>
-              </div>
-              <div className="space-y-4">
-                {[
-                  { name: 'NHAI Green Bond', val: '₹10,200', change: '+2.4%' },
-                  { name: 'Mumbai Metro', val: '₹5,400', change: '+1.8%' },
-                  { name: 'Solar Energy Corp', val: '₹2,100', change: '+5.2%' },
-                ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold text-xs">
-                        {item.name.substring(0, 2)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900 dark:text-white">{item.name}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">AAA Rated</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-900 dark:text-white">{item.val}</p>
-                      <p className="text-xs text-green-600 dark:text-green-400">{item.change}</p>
-                    </div>
+            <SaturnRing>
+              <div className="relative z-10 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 p-6 max-w-md mx-auto transform rotate-2 hover:rotate-0 transition duration-500">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Total Value Locked</p>
+                    <h3 className="text-2xl font-bold dark:text-white transition-all duration-500">{currentTvl}</h3>
                   </div>
-                ))}
+                  <div className="text-green-500 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full text-sm font-bold">
+                    +12.5% 📈
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { name: 'NHAI Green Bond', val: '₹10,200', change: '+2.4%' },
+                    { name: 'Mumbai Metro', val: '₹5,400', change: '+1.8%' },
+                    { name: 'Solar Energy Corp', val: '₹2,100', change: '+5.2%' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold text-xs">
+                          {item.name.substring(0, 2)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900 dark:text-white">{item.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">AAA Rated</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-slate-900 dark:text-white">{item.val}</p>
+                        <p className="text-xs text-green-600 dark:text-green-400">{item.change}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                  <span>Live Updates • 2ms latency</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online</span>
+                </div>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                <span>Live Updates • 2ms latency</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online</span>
-              </div>
-            </div>
+            </SaturnRing>
 
             {/* Floating Elements */}
             <motion.div
@@ -206,7 +209,7 @@ export default function Home() {
       <footer className="bg-slate-950 text-slate-400 py-16 border-t border-slate-800 text-sm">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12">
           <div>
-            <div className="text-white text-xl font-bold mb-4">BondPlatform</div>
+            <div className="text-white text-xl font-bold mb-4">MUD₹A</div>
             <p className="mb-4">Democratizing infrastructure finance through blockchain technology. Safe, transparent, and accessible.</p>
             <div className="flex gap-4">
               {/* Social Icons would go here */}
@@ -239,7 +242,7 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-slate-800 text-xs text-slate-500 text-center">
           <p className="mb-2">Regulated by SEBI · RBI Compliant · ISO 27001 Certified</p>
-          <p>© 2026 BondPlatform Technologies Pvt Ltd. All rights reserved.</p>
+          <p>© 2026 MUD₹A Technologies Pvt Ltd. All rights reserved.</p>
         </div>
       </footer>
     </div>
