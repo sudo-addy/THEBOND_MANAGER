@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { api } from '../../services/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, Lock, User, Building2, Briefcase, ChevronRight, Wallet, ArrowRight, HelpCircle } from 'lucide-react';
+import { ArrowRight, Lock, User, Building2, Briefcase, ShieldCheck } from 'lucide-react';
 import WalletConnectModule from '@/components/auth/WalletConnectModule';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial } from '@react-three/drei';
@@ -72,17 +72,20 @@ export default function LoginPage() {
     });
   }, { scope: containerRef });
 
-  const handleDemoLogin = (type: 'retail' | 'institution' | 'admin') => {
-    setActiveTab(type);
+  const handleDemoLogin = (type: 'retail' | 'institution' | 'government' | 'premium') => {
+    setActiveTab(type as any);
     if (type === 'retail') {
-      setEmail('basic@bondplatform.demo');
-      setPassword('Basic@CIH2026');
+      setEmail('retail@mudra.com');
+      setPassword('Retail@CIH2026');
     } else if (type === 'institution') {
+      setEmail('institution@mudra.demo');
+      setPassword('Inst@CIH2026');
+    } else if (type === 'government') {
+      setEmail('government@mudra.demo');
+      setPassword('Gov@CIH2026');
+    } else if (type === 'premium') {
       setEmail('premium@bondplatform.demo');
       setPassword('Premium@CIH2026');
-    } else {
-      setEmail('admin@bondplatform.demo');
-      setPassword('Admin@CIH2026');
     }
   };
 
@@ -102,7 +105,12 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(response.user));
         // Set cookie for middleware authentication (7 days expiry)
         document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-        router.push('/dashboard');
+
+        if (email === 'government@mudra.demo') {
+          router.push('/government-dashboard');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         throw new Error('Login successful but no token received');
       }
@@ -160,22 +168,23 @@ export default function LoginPage() {
           </div>
 
           {/* Role Tabs */}
-          <div className="bg-slate-100 dark:bg-slate-900 p-1 rounded-xl flex mb-8">
+          <div className="bg-slate-100 dark:bg-slate-900 p-1 rounded-xl flex mb-8 overflow-x-auto">
             {[
               { id: 'retail', icon: User, label: 'Retail' },
               { id: 'institution', icon: Building2, label: 'Institution' },
-              { id: 'admin', icon: Briefcase, label: 'Admin' }
+              { id: 'government', icon: ShieldCheck, label: 'Govt' },
+              { id: 'premium', icon: Briefcase, label: 'Premium' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleDemoLogin(tab.id as any)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
                   ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="">{tab.label}</span>
               </button>
             ))}
           </div>

@@ -47,6 +47,11 @@ export interface BondAnalytics {
     expected_returns: number;
     recommendation_score: number;
     market_sentiment: 'bullish' | 'bearish' | 'neutral';
+    // Extended fields for Trading Coach
+    score?: number;
+    sentiment?: string;
+    analysis?: string;
+    tags?: string[];
 }
 
 // Portfolio & Trading types

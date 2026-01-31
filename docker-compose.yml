@@ -14,6 +14,12 @@ services:
       - mongodb_data:/data/db
     networks:
       - bond-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -22,6 +28,11 @@ services:
       - "6379:6379"
     networks:
       - bond-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   backend:
     build:
@@ -32,9 +43,10 @@ services:
       - "3210:3210"
     environment:
       NODE_ENV: development
-      MONGODB_URI: mongodb://admin:password@mongodb:27017/bond_platform
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/bond_platform?authSource=admin
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: your_super_secret_jwt_key_minimum_32_characters_long
+      JWT_SECRET: b8f3c9d2e7a1f5b6c4d8e2f9a3b7c1d5e9f2a6b8c3d7e1f4a9b2c6d1e5f8a3b7
+      JWT_REFRESH_SECRET: d5e9f2a6b8c3d7e1f4a9b2c6d1e5f8a3b7c1d5e9f2a6b8c3d7e1f4a9b2c6d1e5
       CORS_ORIGIN: http://localhost:3000
     depends_on:
       - mongodb
@@ -43,6 +55,12 @@ services:
       - ./backend/src:/app/src
     networks:
       - bond-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3210/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
@@ -58,6 +76,12 @@ services:
       - backend
     networks:
       - bond-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 volumes:
   mongodb_data:

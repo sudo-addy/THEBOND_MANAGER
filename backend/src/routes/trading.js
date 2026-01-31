@@ -7,7 +7,7 @@ const Bond = require('../models/Bond');
 const { v4: uuidv4 } = require('uuid');
 
 const { validate } = require('../middleware/validation');
-const { buyBondValidation } = require('../middleware/validationSchemas');
+const { buyBondValidation, sellBondValidation } = require('../middleware/validationSchemas');
 
 // Buy bond
 const mongoose = require('mongoose');
@@ -138,6 +138,121 @@ router.post('/buy', authMiddleware, validate(buyBondValidation), async (req, res
     }
     // Pass custom errors with 400 status if distinct
     if (error.message.includes('Insufficient') || error.message.includes('Bond not')) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+    next(error);
+  } finally {
+    if (useTransaction && session) {
+      session.endSession();
+    }
+  }
+});
+
+// Sell bond
+/**
+ * @route POST /api/v1/trading/sell
+ * @desc Sell a bond from portfolio and credit wallet
+ * @access Private
+ * @body {string} bond_id - ID of the bond to sell
+ * @body {number} quantity - Number of units to sell
+ * @body {number} price_per_unit - Current market price per unit
+ * @returns {Object} Transaction details and updated balance
+ */
+router.post('/sell', authMiddleware, validate(sellBondValidation), async (req, res, next) => {
+  const useTransaction = process.env.NODE_ENV !== 'test';
+  let session = null;
+  if (useTransaction) {
+    session = await mongoose.startSession();
+    session.startTransaction();
+  }
+
+  try {
+    const { bond_id, quantity, price_per_unit } = req.body;
+
+    // 1. Fetch Bond
+    const bond = await Bond.findById(bond_id).session(session);
+    if (!bond) {
+      throw new Error('Bond not found');
+    }
+
+    const total_amount = quantity * price_per_unit;
+
+    // 2. Fetch Portfolio
+    const portfolio = await Portfolio.findOne({ user_id: req.user.user_id }).session(session);
+    if (!portfolio) {
+      throw new Error('Portfolio not found');
+    }
+
+    // 3. Check Holdings
+    const holdingIndex = portfolio.holdings.findIndex(h => h.bond_id.toString() === bond_id);
+    if (holdingIndex === -1) {
+      throw new Error('You do not own this bond');
+    }
+
+    const holding = portfolio.holdings[holdingIndex];
+    if (holding.quantity < quantity) {
+      throw new Error(`Insufficient holdings. You own ${holding.quantity} units, trying to sell ${quantity}`);
+    }
+
+    // 4. Create Transaction
+    const transaction = new Transaction({
+      transaction_id: `TXN-${uuidv4()}`,
+      user_id: req.user.user_id,
+      bond_id,
+      type: 'sell',
+      quantity,
+      price_per_unit,
+      total_amount,
+      payment_method: 'wallet',
+      payment_status: 'completed',
+      status: 'confirmed'
+    });
+
+    await transaction.save({ session });
+
+    // 5. Update Portfolio Holdings
+    holding.quantity -= quantity;
+
+    // Remove holding if quantity reaches zero
+    if (holding.quantity === 0) {
+      portfolio.holdings.splice(holdingIndex, 1);
+    }
+
+    // Update portfolio balance
+    portfolio.virtual_balance += total_amount;
+    portfolio.total_invested = Math.max(0, (portfolio.total_invested || 0) - total_amount);
+    await portfolio.save({ session });
+
+    // 6. Update Bond Inventory
+    bond.units_available += quantity;
+    bond.units_sold -= quantity;
+    await bond.save({ session });
+
+    if (useTransaction && session) {
+      await session.commitTransaction();
+    }
+
+    // Send Trade Confirmation Email (async)
+    const emailService = require('../services/emailService');
+    const fullUser = await require('../models/User').findById(req.user.user_id);
+    if (fullUser) {
+      emailService.sendTradeConfirmation(fullUser, transaction, bond).catch(err =>
+        console.error('Failed to send trade email:', err)
+      );
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Bond sold successfully',
+      transaction,
+      new_balance: portfolio.virtual_balance
+    });
+
+  } catch (error) {
+    if (useTransaction && session) {
+      await session.abortTransaction();
+    }
+    if (error.message.includes('Insufficient') || error.message.includes('not found') || error.message.includes('do not own')) {
       return res.status(400).json({ success: false, error: error.message });
     }
     next(error);

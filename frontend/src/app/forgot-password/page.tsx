@@ -53,7 +53,6 @@ export default function ForgotPasswordPage() {
     const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Email, 2: OTP, 3: New Password
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
-    const [expectedOtp, setExpectedOtp] = useState(''); // Store the OTP received from API for verification
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -75,16 +74,11 @@ export default function ForgotPasswordPage() {
         setErrorMsg('');
         setSuccessMsg('');
         try {
-            const response = await api.auth.forgotPassword(email); // Returns { demoOtp: '...' }
-            setSuccessMsg(`OTP sent to ${email}`);
-
-            if (response.demoOtp) {
-                setExpectedOtp(response.demoOtp);
-            }
-
+            const response = await api.auth.forgotPassword(email);
+            setSuccessMsg(response.message || `OTP sent to ${email}`);
             setStep(2);
         } catch (err: any) {
-            setErrorMsg('Failed to send OTP. Please try again.');
+            setErrorMsg(err?.response?.data?.error || 'Failed to send OTP. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -92,17 +86,25 @@ export default function ForgotPasswordPage() {
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setErrorMsg("Passwords do not match");
+            return;
+        }
+
         setLoading(true);
         setErrorMsg('');
         setSuccessMsg('');
+
         try {
-            // Pass the expectedOtp for client-side demo verification
-            // In a real app, the backend would verify this against Redis/DB
-            await api.auth.verifyOtp(email, otp, expectedOtp);
-            setSuccessMsg('');
-            setStep(3);
+            // Backend now verifies OTP and resets password in one call
+            await api.auth.resetPassword(email, otp, password);
+            setSuccessMsg('Password reset successfully! Redirecting to login...');
+            setTimeout(() => {
+                router.push('/login');
+            }, 2000);
         } catch (err: any) {
-            setErrorMsg(err.message || 'Invalid OTP');
+            setErrorMsg(err?.response?.data?.error || 'Invalid OTP or failed to reset password');
         } finally {
             setLoading(false);
         }
@@ -110,28 +112,7 @@ export default function ForgotPasswordPage() {
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setErrorMsg('');
-        setSuccessMsg('');
-
-        if (password !== confirmPassword) {
-            setErrorMsg("Passwords do not match");
-            setLoading(false);
-            return;
-        }
-
-        try {
-            await api.auth.resetPassword(email, otp, password);
-            // Success State
-            setSuccessMsg('Password reset successfully! Redirecting to login...');
-            setTimeout(() => {
-                router.push('/login');
-            }, 2000);
-        } catch (err: any) {
-            setErrorMsg('Failed to reset password.');
-        } finally {
-            setLoading(false);
-        }
+        await handleVerifyOtp(e);
     };
 
     return (

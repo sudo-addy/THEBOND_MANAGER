@@ -71,15 +71,42 @@ const analyzeBond = async (bond) => {
     const riskScore = calculateRiskScore(bond);
     const recommendationScore = calculateRecommendationScore(bond);
 
-    let sentiment = 'neutral';
-    if (recommendationScore > 7.5) sentiment = 'bullish';
-    else if (recommendationScore < 4) sentiment = 'bearish';
+    let sentiment = 'Neutral';
+    if (recommendationScore > 7.5) sentiment = 'Bullish';
+    else if (recommendationScore < 4) sentiment = 'Bearish';
+
+    // Generate tags based on bond properties
+    const tags = [];
+    if (bond.risk_category === 'low') tags.push('Safe Haven');
+    if (bond.coupon_rate > 9) tags.push('High Yield');
+    if (bond.maturity_date && new Date(bond.maturity_date).getFullYear() - new Date().getFullYear() < 3) tags.push('Short Term');
+    if (bond.credit_rating && bond.credit_rating.startsWith('A')) tags.push('Investment Grade');
+    if (tags.length === 0) tags.push('Balanced');
+
+    // Generate analysis text
+    const safetyScore = 100 - riskScore;
+    let analysisText = `### **Investment Memo**\n\n`;
+    analysisText += `**Rating:** ${bond.credit_rating} | **Yield:** ${bond.coupon_rate}%\n\n`;
+
+    if (safetyScore > 80) {
+        analysisText += `This bond indicates a **very strong safety profile**. With a credit rating of ${bond.credit_rating}, it represents a low-risk investment suitable for capital preservation strategies. The returns are modest but reliable.`;
+    } else if (safetyScore > 50) {
+        analysisText += `This bond offers a **balanced risk-reward ratio**. The ${bond.coupon_rate}% yield helps hedge against inflation, while the ${bond.risk_category} risk profile suggests moderate volatility exposure.`;
+    } else {
+        analysisText += `**High Risk Warning**: This bond offers aggressive returns at ${bond.coupon_rate}%, but comes with significant credit risk. Only suitable for diversified, high-tolerance portfolios looking for yield enhancement.`;
+    }
 
     return {
+        // Internal Metrics
         risk_score: riskScore,
-        expected_returns: bond.coupon_rate, // Simplified: yield = coupon
         recommendation_score: recommendationScore,
-        market_sentiment: sentiment
+        market_sentiment: sentiment.toLowerCase(),
+
+        // Frontend "AITradingCoach" Expected Fields
+        score: safetyScore, // Frontend expects a "Safety Score" (Higher is better)
+        sentiment: sentiment, // Capitalized for display
+        analysis: analysisText,
+        tags: tags.slice(0, 3) // Limit to 3 tags
     };
 };
 

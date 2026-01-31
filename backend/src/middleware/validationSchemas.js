@@ -35,11 +35,64 @@ const loginValidation = [
         .withMessage('Password is required')
 ];
 
+const forgotPasswordValidation = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Valid email is required')
+];
+
+const resetPasswordValidation = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Valid email is required'),
+
+    body('otp')
+        .isLength({ min: 6, max: 6 })
+        .isNumeric()
+        .withMessage('OTP must be a 6-digit number'),
+
+    body('newPassword')
+        .isLength({ min: 8 })
+        .withMessage('Password must be at least 8 characters')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+        .withMessage('Password must contain uppercase, lowercase, number, and special character')
+];
+
+const sendOtpValidation = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Valid email is required'),
+
+    body('purpose')
+        .optional()
+        .isIn(['password_reset', 'verification', 'login'])
+        .withMessage('Invalid OTP purpose')
+];
+
 /**
  * Validation schemas for trading routes
  */
 
 const buyBondValidation = [
+    body('bond_id')
+        .notEmpty()
+        .withMessage('Bond ID is required')
+        .isMongoId()
+        .withMessage('Invalid bond ID format'),
+
+    body('quantity')
+        .isInt({ min: 1, max: 10000 })
+        .withMessage('Quantity must be between 1 and 10,000'),
+
+    body('price_per_unit')
+        .isFloat({ min: 0.01 })
+        .withMessage('Price must be a positive number')
+];
+
+const sellBondValidation = [
     body('bond_id')
         .notEmpty()
         .withMessage('Bond ID is required')
@@ -130,7 +183,11 @@ const bondQueryValidation = [
 module.exports = {
     registerValidation,
     loginValidation,
+    forgotPasswordValidation,
+    resetPasswordValidation,
+    sendOtpValidation,
     buyBondValidation,
+    sellBondValidation,
     createBondValidation,
     bondQueryValidation
 };

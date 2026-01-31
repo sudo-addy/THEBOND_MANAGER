@@ -144,6 +144,48 @@ class EmailService {
         `;
         return this.sendMail(user.email, subject, html);
     }
+
+    async sendOtpEmail(email, otp, purpose = 'verification') {
+        const subject = purpose === 'password_reset'
+            ? 'Password Reset OTP'
+            : 'Verification Code';
+
+        const purposeText = {
+            'password_reset': 'reset your password',
+            'verification': 'verify your account',
+            'login': 'complete your login'
+        };
+
+        const html = `
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">InfraBond Platform</h1>
+                </div>
+                <div style="padding: 40px 30px; background-color: #f8f9fa; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #333; margin-bottom: 20px;">Your Verification Code</h2>
+                    <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+                        Use the following code to ${purposeText[purpose] || 'verify your action'}:
+                    </p>
+                    <div style="background-color: white; padding: 25px; border-radius: 8px; text-align: center; margin: 30px 0;">
+                        <div style="font-size: 42px; font-weight: bold; letter-spacing: 8px; color: #667eea; font-family: 'Courier New', monospace;">
+                            ${otp}
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: #666; margin-top: 30px;">
+                        This code will expire in <strong>10 minutes</strong>.
+                    </p>
+                    <p style="font-size: 14px; color: #666; margin-top: 20px;">
+                        If you didn't request this code, please ignore this email or contact support if you're concerned about your account security.
+                    </p>
+                </div>
+                <div style="padding: 20px; text-align: center; color: #999; font-size: 12px;">
+                    <p>© 2026 InfraBond Platform. All rights reserved.</p>
+                </div>
+            </div>
+        `;
+
+        return this.sendMail(email, subject, html);
+    }
 }
 
 module.exports = new EmailService();

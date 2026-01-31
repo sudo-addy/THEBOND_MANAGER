@@ -62,36 +62,14 @@ interface BuyParams {
   price_per_unit: number;
 }
 
+interface SellParams {
+  bond_id: string;
+  quantity: number;
+  price_per_unit: number;
+}
+
 export const api = {
   client,
-  import emailjs from '@emailjs/browser';
-
-  // Helper to send OTP via EmailJS
-  const sendOtpEmail = async (email: string, otp: string) => {
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
-
-    if (!serviceId || !templateId || !publicKey) {
-      console.warn('EmailJS env variables missing. Falling back to console log.');
-      console.log(`[Mock Email] To: ${email}, OTP: ${otp}`);
-      return;
-    }
-
-    try {
-      await emailjs.send(serviceId, templateId, {
-        to_email: email,
-        otp_code: otp,
-        message: `Your verification code is ${otp}`,
-      }, publicKey);
-    } catch (error) {
-      console.error('EmailJS Send Error:', error);
-      // Fallback so the flow doesn't break for the user
-      alert(`Failed to send email (EmailJS Error). Mock OTP: ${otp}`);
-    }
-  };
-
-  // ... existing code ...
 
   auth: {
     register: async (data: RegisterParams): Promise<AuthResponse> => {
@@ -102,32 +80,20 @@ export const api = {
       const r = await client.post('/auth/login', data);
       return r.data;
     },
-    // Modified to return the OTP for client-side verification demo
-    forgotPassword: async (email: string): Promise<{ success: boolean; message: string; demoOtp?: string }> => {
-      // Generate random 6-digit OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // Send via EmailJS
-      await sendOtpEmail(email, otp);
-
-      return {
-        success: true,
-        message: 'If an account exists with this email, you will receive a reset link.',
-        demoOtp: otp // Returned ONLY for demo purposes so frontend can verify
-      };
+    // Trigger password reset flow - sends OTP to email via backend
+    forgotPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
+      const r = await client.post('/auth/forgot-password', { email });
+      return r.data;
     },
-    verifyOtp: async (email: string, otp: string, expectedOtp?: string): Promise<{ success: boolean; message: string }> => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Verify against the dynamic OTP (passed from frontend state) or the hardcoded fallback
-      const isValid = (expectedOtp && otp === expectedOtp) || otp === '123456';
-
-      if (isValid) return { success: true, message: 'OTP Verified' };
-      throw new Error('Invalid OTP. Please try again.');
+    // Send OTP for various purposes
+    sendOtp: async (email: string, purpose: string = 'verification'): Promise<{ success: boolean; message: string; expiresIn: number }> => {
+      const r = await client.post('/auth/send-otp', { email, purpose });
+      return r.data;
     },
-    resetPassword: async (email: string, otp: string, password: string): Promise<{ success: boolean; message: string }> => {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      return { success: true, message: 'Password reset successfully' };
+    // Reset password using OTP
+    resetPassword: async (email: string, otp: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
+      const r = await client.post('/auth/reset-password', { email, otp, newPassword });
+      return r.data;
     },
   },
   bonds: {
@@ -154,6 +120,10 @@ export const api = {
   trading: {
     buy: async (data: BuyParams): Promise<{ success: boolean; transaction?: Transaction; new_balance?: number; error?: string; message?: string }> => {
       const r = await client.post('/trading/buy', data);
+      return r.data;
+    },
+    sell: async (data: SellParams): Promise<{ success: boolean; transaction?: Transaction; new_balance?: number; error?: string; message?: string }> => {
+      const r = await client.post('/trading/sell', data);
       return r.data;
     },
   },

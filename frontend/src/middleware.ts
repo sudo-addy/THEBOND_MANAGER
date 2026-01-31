@@ -9,6 +9,7 @@ const protectedRoutes = [
     '/paper-trade',
     '/analytics',
     '/settings',
+    '/government-dashboard',
 ];
 
 // Routes that should redirect to dashboard if already authenticated

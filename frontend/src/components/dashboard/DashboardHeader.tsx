@@ -1,10 +1,42 @@
 'use client';
 
 import { Search, Bell, Menu, User, LogOut, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardHeader() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        // Load user from local storage
+        if (typeof window !== 'undefined') {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    setUser(JSON.parse(userStr));
+                } catch (e) {
+                    console.error('Failed to parse user data', e);
+                }
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            document.cookie = 'auth_token=; path=/; max-age=0';
+            router.push('/login');
+        }
+    };
+
+    // Default fallback if no user
+    const displayName = user?.name || 'Guest';
+    const displayRole = user?.role || 'Visitor';
+    const displayInitials = displayName.slice(0, 2).toUpperCase();
+    const displayEmail = user?.email || '';
 
     return (
         <header className="px-6 py-4 flex items-center justify-between sticky top-0 bg-[#050b14]/80 backdrop-blur-xl z-30 border-b border-white/5">
@@ -47,25 +79,28 @@ export default function DashboardHeader() {
                         className="flex items-center gap-3 hover:bg-white/5 rounded-xl p-1.5 pr-3 transition border border-transparent hover:border-white/5"
                     >
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                            AB
+                            {displayInitials}
                         </div>
                         <div className="hidden sm:block text-left">
-                            <p className="text-sm font-bold text-white leading-none">Abhi</p>
-                            <p className="text-[10px] text-slate-400 font-medium">Retail Investor</p>
+                            <p className="text-sm font-bold text-white leading-none">{displayName}</p>
+                            <p className="text-[10px] text-slate-400 font-medium capitalize">{displayRole}</p>
                         </div>
                     </button>
 
                     {isProfileOpen && (
                         <div className="absolute right-0 top-full mt-2 w-56 bg-[#0f172a] border border-slate-800 rounded-xl shadow-2xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                             <div className="px-4 py-3 border-b border-slate-800">
-                                <p className="text-sm font-bold text-white">Abhi User</p>
-                                <p className="text-xs text-slate-500 truncate">abhi@example.com</p>
+                                <p className="text-sm font-bold text-white">{displayName}</p>
+                                <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
                             </div>
                             <div className="p-1">
                                 <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-lg text-left">
                                     <User className="w-4 h-4" /> Profile
                                 </button>
-                                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg text-left">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg text-left"
+                                >
                                     <LogOut className="w-4 h-4" /> Sign Out
                                 </button>
                             </div>
