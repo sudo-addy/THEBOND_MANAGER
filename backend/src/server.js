@@ -23,6 +23,9 @@ try {
   const { errorHandler } = require('./middleware/errorHandler');
   const { rateLimiter } = require('./middleware/rateLimiter');
   const { requestLogger } = require('./middleware/logger');
+  const { corsMiddleware } = require('./middleware/cors');
+  const { sanitizeInput } = require('./middleware/validation');
+  const { performanceMonitor } = require('./middleware/monitor');
 
   const app = express();
   const httpServer = createServer(app);
@@ -33,14 +36,16 @@ try {
     }
   });
 
-  // Middleware
+  // Security & Performance Middleware (order matters!)
   app.use(helmet()); // Security Headers
+  app.use(corsMiddleware); // Enhanced CORS
   app.use(compression()); // Gzip Compression
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(cors());
-  app.use(requestLogger);
-  app.use(rateLimiter);
+  app.use(sanitizeInput); // XSS Protection
+  app.use(requestLogger); // Request Logging
+  app.use(performanceMonitor); // Performance Monitoring
+  app.use(rateLimiter); // Rate Limiting
 
   // Database connection
   mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bond_platform')
