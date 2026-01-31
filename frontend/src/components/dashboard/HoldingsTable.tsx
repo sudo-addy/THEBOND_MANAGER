@@ -1,8 +1,12 @@
 'use client';
 
-import { MoreHorizontal, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { useState } from 'react';
+import { MoreHorizontal, ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
+import RebalanceModal from './RebalanceModal';
 
 export default function HoldingsTable() {
+    const [isRebalanceOpen, setIsRebalanceOpen] = useState(false);
+
     const holdings = [
         { id: 1, name: 'NHAI Green Bond Series IV', qty: 50, avg: 1000, current: 1042, risk: 'Low', score: 92 },
         { id: 2, name: 'Mumbai Metro Infrastructure', qty: 200, avg: 500, current: 525, risk: 'Low', score: 88 },
@@ -11,10 +15,17 @@ export default function HoldingsTable() {
     ];
 
     return (
-        <div className="glass-panel rounded-2xl p-6">
+        <div className="glass-panel rounded-2xl p-6 relative">
+            <RebalanceModal isOpen={isRebalanceOpen} onClose={() => setIsRebalanceOpen(false)} />
+
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-white">Your Holdings</h3>
-                <button className="text-sm text-blue-400 hover:text-white transition">View Portfolio</button>
+                <button
+                    onClick={() => setIsRebalanceOpen(true)}
+                    className="flex items-center gap-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition shadow-lg shadow-indigo-900/20"
+                >
+                    <RefreshCw className="w-3.5 h-3.5" /> Rebalance Portfolio
+                </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -62,9 +73,26 @@ export default function HoldingsTable() {
                                             {bond.score}/100
                                         </span>
                                     </td>
-                                    <td className="py-4 text-right pr-2">
-                                        <button className="p-1 hover:bg-white/10 rounded transition text-slate-500 hover:text-white">
+                                    <td className="py-4 text-right pr-2 relative group-hover:visible">
+                                        <button className="p-1 hover:bg-white/10 rounded transition text-slate-500 hover:text-white group">
                                             <MoreHorizontal className="w-4 h-4" />
+                                            {/* Simple Hover Dropdown for Demo */}
+                                            <div className="absolute right-8 top-1/2 -translate-y-1/2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-20 overflow-hidden">
+                                                <div className="p-1">
+                                                    <div className="px-3 py-2 hover:bg-white/5 rounded-lg text-left cursor-pointer flex items-center gap-2">
+                                                        <ArrowUpRight className="w-3 h-3" /> View Details
+                                                    </div>
+                                                    <div
+                                                        onClick={() => setIsRebalanceOpen(true)}
+                                                        className="px-3 py-2 hover:bg-indigo-500/10 hover:text-indigo-400 rounded-lg text-left cursor-pointer flex items-center gap-2"
+                                                    >
+                                                        <RefreshCw className="w-3 h-3" /> Rebalance
+                                                    </div>
+                                                    <div className="px-3 py-2 hover:bg-red-500/10 hover:text-red-400 rounded-lg text-left cursor-pointer flex items-center gap-2">
+                                                        <ArrowDownRight className="w-3 h-3" /> Sell Position
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </button>
                                     </td>
                                 </tr>

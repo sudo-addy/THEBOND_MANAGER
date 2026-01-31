@@ -1,0 +1,12 @@
+Error: Route.post() requires a callback function but got a [object Object]
+    at Route.<computed> [as post] (C:\Users\Abhi\OneDrive\Desktop\Hackthon\CIH\CoDevians_9.12_SDG9\backend\node_modules\express\lib\router\route.js:216:15)
+    at proto.<computed> [as post] (C:\Users\Abhi\OneDrive\Desktop\Hackthon\CIH\CoDevians_9.12_SDG9\backend\node_modules\express\lib\router\index.js:521:19)
+    at Object.<anonymous> (C:\Users\Abhi\OneDrive\Desktop\Hackthon\CIH\CoDevians_9.12_SDG9\backend\src\routes\payments.js:8:8)
+    at Module._compile (node:internal/modules/cjs/loader:1803:14)
+    at Object..js (node:internal/modules/cjs/loader:1934:10)
+    at Module.load (node:internal/modules/cjs/loader:1524:32)
+    at Module._load (node:internal/modules/cjs/loader:1326:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1547:12)
+Route.post() requires a callback function but got a [object Object]

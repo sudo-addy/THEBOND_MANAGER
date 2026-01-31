@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, User, Building2, ChevronDown, ArrowRight, Wallet, PieChart, HelpCircle, ExternalLink, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
+import { api } from '@/services/api';
 
 // --- Components ---
 
@@ -72,11 +73,11 @@ export default function SignupPage() {
     setLoading(true);
     setError('');
     try {
-      // Simulate API call for demo if backend not ready, or real call
-      // await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, formData);
+      await api.auth.register(formData);
       router.push('/login?success=true');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Signup failed');
+      console.error(err);
+      setError(err.response?.data?.error || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }

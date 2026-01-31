@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Lock, User, Building2, Briefcase, ChevronRight, Wallet } from 'lucide-react';
+import WalletConnectModule from '@/components/auth/WalletConnectModule';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,16 +37,15 @@ export default function LoginPage() {
 
     try {
       // Simulate login for demo if backend fails or for UX speed
-      const response = await api.auth.login(email, password).catch(() => ({
-        tokens: { access_token: 'demo-token' },
-        user: { name: 'Demo User', role: activeTab, email: email }
-      }));
+      const response = await api.auth.login(email, password);
 
       localStorage.setItem('access_token', response.tokens.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       router.push('/dashboard');
     } catch (err: any) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+      const errorMessage = err?.response?.data?.error || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMessage === 'Network Error' ? 'Checking server connection...' : errorMessage);
     } finally {
       setLoading(false);
     }
@@ -148,9 +148,7 @@ export default function LoginPage() {
             <div className="h-px flex-1 bg-white/10"></div>
           </div>
 
-          <button className="relative z-10 w-full border border-white/20 bg-white/5 text-blue-100 font-bold py-3 rounded-xl hover:bg-white/10 transition flex items-center justify-center gap-2">
-            <Wallet className="w-4 h-4 text-orange-400" /> Connect Wallet
-          </button>
+          <WalletConnectModule />
         </div>
 
         {/* Footer & Trust */}

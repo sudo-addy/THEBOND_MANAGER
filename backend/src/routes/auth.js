@@ -9,18 +9,18 @@ const Portfolio = require('../models/Portfolio');
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
-    
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
-    
+
     const user = new User({ email, password, name });
     await user.save();
-    
+
     // Create portfolio
     await Portfolio.create({ user_id: user._id });
-    
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -35,33 +35,36 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
-    
+
     const user = await User.findOne({ email });
     if (!user) {
+      console.log(`Login failed: User not found for ${email}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     let isValid = false;
     try {
       isValid = await user.comparePassword(password);
+      console.log(`Login attempt for ${email}: Password valid? ${isValid}`);
     } catch (pwErr) {
       console.error('Password comparison error:', pwErr);
       return res.status(500).json({ error: 'Authentication failed' });
     }
-    
+
     if (!isValid) {
+      console.log(`Login failed: Invalid password for ${email}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const jwtSecret = process.env.JWT_SECRET || 'dev_secret_key_minimum_32_characters_for_testing_only';
     const accessToken = jwt.sign({ user_id: user._id }, jwtSecret, {
       expiresIn: process.env.JWT_EXPIRY || '1h'
     });
-    
+
     res.json({
       success: true,
       message: 'Login successful',

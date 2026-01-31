@@ -17,20 +17,15 @@ build/
 .DS_Store
 *.pem
 
-# Debug
+# Database
+database/data/
+backend/database/data/
+**/WiredTiger*
+**/*.lock
+*.log
 npm-debug.log*
 yarn-debug.log*
 ts-debug.log*
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Vercel
-.vercel
 
 # TypeScript
 *.tsbuildinfo

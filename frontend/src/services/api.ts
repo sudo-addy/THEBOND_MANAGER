@@ -81,4 +81,24 @@ export const api = {
       return r.data;
     },
   },
+  payments: {
+    deposit: async (data: { amount: number, method: string }) => {
+      const r = await client.post('/payments/deposit', data);
+      return r.data;
+    },
+    getBalance: async () => {
+      const r = await client.get('/payments/balance');
+      return r.data;
+    }
+  },
+  ai: {
+    analyze: async (bondId: string) => {
+      const r = await client.get(`/ai/analyze/${bondId}`);
+      return r.data;
+    },
+    chat: async (message: string) => {
+      const r = await client.post('/ai/chat', { message });
+      return r.data;
+    }
+  }
 };

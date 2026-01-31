@@ -1,19 +1,47 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowRight, Wallet, Clock, Lock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Wallet, Clock, Lock, CheckCircle } from 'lucide-react';
+import { useTradingStore } from '@/store/tradingStore';
 
 export default function OrderEntryPanel() {
+    const { currentPrice, executeOrder } = useTradingStore();
+
     const [side, setSide] = useState<'buy' | 'sell'>('buy');
     const [type, setType] = useState<'market' | 'limit'>('limit');
-    const [qty, setQty] = useState<number>(50);
-    const [price, setPrice] = useState<number>(1042.50);
+    const [qty, setQty] = useState<number>(10);
+    const [limitPrice, setLimitPrice] = useState<number>(currentPrice);
+    const [successMsg, setSuccessMsg] = useState('');
 
-    const total = qty * price;
+    // Update limit price default when market moves, only if user hasn't edited it manually? 
+    // For simplicity, let's keep it manual or sync on mount.
+    useEffect(() => {
+        if (type === 'market') {
+            setLimitPrice(currentPrice);
+        }
+    }, [currentPrice, type]);
+
+    const finalPrice = type === 'market' ? currentPrice : limitPrice;
+    const total = qty * finalPrice;
     const fees = total * 0.001; // 0.1% fee
 
+    const handleOrder = () => {
+        executeOrder(side, qty, finalPrice);
+        setSuccessMsg(`Successfully ${side === 'buy' ? 'bought' : 'sold'} ${qty} units at ₹${finalPrice.toFixed(2)}`);
+
+        setTimeout(() => setSuccessMsg(''), 3000);
+    };
+
     return (
-        <div className="glass-panel p-6 rounded-xl h-full flex flex-col">
+        <div className="glass-panel p-6 rounded-xl h-full flex flex-col relative overflow-hidden">
+            {successMsg && (
+                <div className="absolute inset-0 z-20 bg-slate-900/90 flex flex-col items-center justify-center text-center p-4 animate-in fade-in zoom-in">
+                    <CheckCircle className="w-12 h-12 text-green-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-1">Order Executed</h3>
+                    <p className="text-slate-300">{successMsg}</p>
+                </div>
+            )}
+
             {/* Buy / Sell Tabs */}
             <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-slate-900/50 rounded-lg border border-slate-800">
                 <button
@@ -52,10 +80,10 @@ export default function OrderEntryPanel() {
                     <label className="text-xs text-slate-400 font-medium mb-1 block">Price (₹)</label>
                     <input
                         type="number"
-                        value={price}
-                        onChange={(e) => setPrice(Number(e.target.value))}
+                        value={finalPrice}
+                        onChange={(e) => setLimitPrice(Number(e.target.value))}
                         disabled={type === 'market'}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none disabled:opacity-50"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                 </div>
                 <div>
@@ -99,8 +127,10 @@ export default function OrderEntryPanel() {
                 </div>
             </div>
 
-            <button className={`w-full py-3 rounded-xl font-bold text-sm shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2 ${side === 'buy' ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-red-600 hover:bg-red-500 text-white'
-                }`}>
+            <button
+                onClick={handleOrder}
+                className={`w-full py-3 rounded-xl font-bold text-sm shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2 ${side === 'buy' ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-red-600 hover:bg-red-500 text-white'
+                    }`}>
                 {side === 'buy' ? 'Place Buy Order' : 'Place Sell Order'} <ArrowRight className="w-4 h-4" />
             </button>
         </div>

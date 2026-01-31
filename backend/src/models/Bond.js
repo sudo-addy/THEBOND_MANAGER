@@ -75,6 +75,10 @@ const bondSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-bondSchema.index({ bond_id: 1, issuer: 1, risk_category: 1, status: 1 });
+// Compound indexes for optimized filtering
+bondSchema.index({ status: 1, created_at: -1 }); // Default homepage query
+bondSchema.index({ status: 1, risk_category: 1 }); // Risk filter query
+bondSchema.index({ bond_id: 1 }, { unique: true }); // Search by ID
+bondSchema.index({ name: 'text', issuer: 'text' }); // Text search capability
 
 module.exports = mongoose.model('Bond', bondSchema);

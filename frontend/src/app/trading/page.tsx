@@ -13,16 +13,25 @@ import { ShieldCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { useTradingStore } from '@/store/tradingStore';
+
 export default function TradingPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
+    const { simulateMarket } = useTradingStore();
 
     useEffect(() => {
         // Auth check
         const user = localStorage.getItem('user');
         if (!user) router.push('/login');
         setLoading(false);
-    }, [router]);
+
+        // Start Simulation
+        const cleanup = simulateMarket();
+        return () => {
+            if (typeof cleanup === 'function') cleanup();
+        }
+    }, [router, simulateMarket]);
 
     if (loading) return null;
 
@@ -34,12 +43,24 @@ export default function TradingPage() {
 
                 <TradingHeader />
 
-                <main className="p-4 grid grid-cols-1 xl:grid-cols-4 gap-4">
+                <main className="p-4 space-y-4">
 
-                    {/* LEFT COLUMN: Chart & Position (Wide) */}
-                    <div className="xl:col-span-2 space-y-4">
+                    {/* TOP ROW: Full Width Chart */}
+                    <div className="w-full h-[600px]">
                         <TradingChart />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+
+                    {/* BOTTOM ROW: Trading Workspace */}
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+                        {/* COLUMN 1: Market Data */}
+                        <div className="space-y-4">
+                            <OrderBook />
+                            <RecentTrades />
+                        </div>
+
+                        {/* COLUMN 2: Analysis & Position */}
+                        <div className="space-y-4">
                             <ActivePosition />
                             <div className="glass-panel p-4 rounded-xl flex items-center justify-between border border-blue-500/20 bg-blue-500/5">
                                 <div className="flex items-center gap-3">
@@ -54,22 +75,12 @@ export default function TradingPage() {
                                     <p className="text-xs font-bold text-green-400">Verified ✅</p>
                                 </div>
                             </div>
+                            <TradingAI />
                         </div>
-                        {/* Mobile/Tablet only: Recent Trades move here if low space, but we keep structure simple */}
-                    </div>
 
-                    {/* MIDDLE COLUMN: Market Data (Narrower) */}
-                    <div className="space-y-4">
-                        <OrderBook />
-                        <RecentTrades />
-                    </div>
-
-                    {/* RIGHT COLUMN: Execution & AI (Right Hand) */}
-                    <div className="space-y-4">
-                        <OrderEntryPanel />
-                        <TradingAI />
-                        <div className="hidden 2xl:block">
-                            <TokenizationTracker />
+                        {/* COLUMN 3: Execution */}
+                        <div className="h-full">
+                            <OrderEntryPanel />
                         </div>
                     </div>
 

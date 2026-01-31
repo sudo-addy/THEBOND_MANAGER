@@ -1,51 +1,82 @@
 'use client';
 
-import { Wallet, RotateCcw, TrendingUp, Award } from 'lucide-react';
+import { usePaperTradeStore } from '@/store/paperTradeStore';
+import { Wallet, TrendingUp, AlertCircle, PieChart } from 'lucide-react';
 
 export default function PaperWalletOverview() {
+    const { currentBalance, portfolioValue } = usePaperTradeStore();
+    const totalNetWorth = currentBalance + portfolioValue;
+    const pnl = totalNetWorth - 10000000; // Assuming 1Cr start
+    const pnlPercent = (pnl / 10000000) * 100;
+
     return (
-        <div className="glass-panel p-6 rounded-2xl mb-6 bg-gradient-to-r from-slate-900 to-indigo-900/10 border-indigo-500/20">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                {/* Balance Section */}
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                        <Wallet className="w-7 h-7" />
+            {/* Net Worth Card */}
+            <div className="glass-panel p-4 rounded-xl relative overflow-hidden group">
+                <div className="absolute right-[-10px] top-[-10px] w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition" />
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                        <PieChart className="w-4 h-4" />
                     </div>
-                    <div>
-                        <p className="text-xs text-indigo-200 font-bold uppercase tracking-wider mb-1">Virtual Balance</p>
-                        <h2 className="text-3xl font-black text-white tracking-tight">₹10,00,000</h2>
-                        <p className="text-xs text-slate-400">Paper Wallet • Reset Available</p>
-                    </div>
+                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Net Worth</p>
                 </div>
-
-                {/* Stats Grid */}
-                <div className="flex gap-6">
-                    <div className="text-right">
-                        <p className="text-xs text-slate-400 font-medium">Invested</p>
-                        <p className="text-lg font-bold text-white">₹0</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-xs text-slate-400 font-medium">Unrealized P&L</p>
-                        <p className="text-lg font-bold text-slate-500">--</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-xs text-slate-400 font-medium">Return</p>
-                        <p className="text-lg font-bold text-slate-500">0.0%</p>
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                    <button className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-2 text-xs font-bold">
-                        <RotateCcw className="w-3 h-3" /> Reset
-                    </button>
-                    <div className="px-3 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-xs font-bold flex items-center gap-2">
-                        <Award className="w-3 h-3" /> Rookie Trader
-                    </div>
-                </div>
-
+                <h2 className="text-2xl font-bold text-white font-mono">₹{totalNetWorth.toLocaleString()}</h2>
+                <p className="text-[10px] text-slate-500 mt-1">Virtual Equity + Cash</p>
             </div>
+
+            {/* P&L Card */}
+            <div className="glass-panel p-4 rounded-xl relative overflow-hidden group">
+                <div className="absolute right-[-10px] top-[-10px] w-20 h-20 bg-green-500/10 rounded-full blur-xl group-hover:bg-green-500/20 transition" />
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
+                        <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Profit/Loss</p>
+                </div>
+                <h2 className={`text-2xl font-bold font-mono ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {pnl >= 0 ? '+' : ''}{pnl.toLocaleString()}
+                </h2>
+                <p className={`text-[10px] font-bold mt-1 ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {pnlPercent.toFixed(2)}% All Time
+                </p>
+            </div>
+
+            {/* Cash Balance */}
+            <div className="glass-panel p-4 rounded-xl relative overflow-hidden group">
+                <div className="absolute right-[-10px] top-[-10px] w-20 h-20 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition" />
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                        <Wallet className="w-4 h-4" />
+                    </div>
+                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Available Cash</p>
+                </div>
+                <h2 className="text-2xl font-bold text-white font-mono">₹{currentBalance.toLocaleString()}</h2>
+                <p className="text-[10px] text-slate-500 mt-1">Buying Power (10x Lev)</p>
+            </div>
+
+            {/* Risk Meter & Diversification */}
+            <div className="glass-panel p-4 rounded-xl border-l-2 border-amber-500">
+                <div className="flex justify-between items-start mb-2">
+                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Risk Meter</p>
+                    <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">MODERATE</span>
+                </div>
+
+                {/* Simulated Meter */}
+                <div className="w-full h-2 bg-slate-800 rounded-full mb-3 overflow-hidden">
+                    <div className="w-[45%] h-full bg-gradient-to-r from-green-500 via-amber-500 to-red-500 rounded-full" />
+                </div>
+
+                <div className="flex justify-between text-[10px] text-slate-400">
+                    <span>Safety Score</span>
+                    <span className="text-white font-bold">72/100</span>
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>Diversification</span>
+                    <span className="text-white font-bold">Good</span>
+                </div>
+            </div>
+
         </div>
     );
 }

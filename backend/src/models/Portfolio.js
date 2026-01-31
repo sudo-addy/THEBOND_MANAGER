@@ -35,6 +35,10 @@ const portfolioSchema = new mongoose.Schema({
     type: Number,
     default: 1000000 // ₹10L for paper trading
   },
+  cash_balance: {
+    type: Number,
+    default: 0 // Real Money
+  },
   created_at: {
     type: Date,
     default: Date.now
