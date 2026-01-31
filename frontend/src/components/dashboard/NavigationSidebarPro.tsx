@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard, ShoppingBag, PieChart,
     BarChart2, FileText, Settings, Shield,
-    BookOpen, Crown, Sparkles, ChevronDown, ChevronRight,
+    BookOpen, Crown, ChevronDown, ChevronRight,
     Wallet, LogOut, HelpCircle, User
 } from 'lucide-react';
 import Link from 'next/link';

@@ -1,133 +1,103 @@
-const OpenAI = require('openai');
-
-// Initialize OpenAI conditionally
-let openai = null;
-if (process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-    });
-}
-
 /**
- * Generates an AI investment analysis for a given bond.
- * @param {Object} bond - The bond object to analyze.
- * @param {Object} userProfile - The user's risk profile (optional).
- * @returns {Promise<Object>} - The analysis result.
+ * AI Service for Bond Analytics
+ * Calculates investment scores based on bond parameters and market data
  */
-exports.analyzeBond = async (bond, userProfile) => {
-    try {
-        // 1. Try Real AI Call if Key Exists
-        if (openai) {
-            // In a real hackathon, we might want to save tokens, so maybe we skip this 
-            // unless explicitly enabled. For now, let's fallback to "Smart Simulation" 
-            // to ensure 100% uptime during the demo.
-            // Uncomment below to enable real AI:
-            /*
-            const response = await openai.chat.completions.create({
-                model: "gpt-3.5-turbo",
-                messages: [{ role: "user", content: `Analyze this bond: ${bond.name} yielding ${bond.expected_returns}%` }],
-            });
-            return { analysis: response.choices[0].message.content };
-            */
-        }
 
-        // 2. Smart Simulation (The "Winning" Strategy for Demos)
-        // Returns instant, deterministic, high-quality markdown formatted analysis.
-        return simulateAIAnalysis(bond);
+// Weights for different scoring factors
+const WEIGHTS = {
+    CREDIT_RATING: 0.4,
+    YIELD: 0.3,
+    RISK: 0.2,
+    MATURITY: 0.1
+};
 
-    } catch (error) {
-        console.error("AI Service Error:", error);
-        // Fallback on error
-        return simulateAIAnalysis(bond);
+// Credit rating scores (0-10)
+const RATING_SCORES = {
+    'AAA': 10,
+    'AA+': 9.5,
+    'AA': 9,
+    'A+': 8.5,
+    'A': 8,
+    'BBB+': 7.5,
+    'BBB': 7,
+    'BB+': 6,
+    'BB': 5,
+    'B': 4,
+    'C': 2,
+    'D': 1
+};
+
+const calculateRiskScore = (bond) => {
+    let score = 50; // Base score
+
+    // Adjust based on risk category
+    switch (bond.risk_category) {
+        case 'low': score -= 20; break; // Lower risk score is better for "riskiness", but here we want "safety"
+        case 'medium': break;
+        case 'high': score += 30; break;
     }
+
+    // Adjust based on credit rating
+    const ratingScore = RATING_SCORES[bond.credit_rating] || 5;
+    score -= (ratingScore - 5) * 5;
+
+    return Math.max(0, Math.min(100, score));
 };
 
-/**
- * Generates a chat response for user queries.
- * @param {string} message - The user's message.
- * @returns {Promise<Object>} - The AI response.
- */
-exports.chat = async (message) => {
-    // 1. Check for real AI key (Simulated logic for now as per instructions)
-    // if (openai) { ... }
+const calculateRecommendationScore = (bond) => {
+    let score = 0;
 
-    // 2. Fallback to Smart Rules Engine for Hackathon robustness
-    return simulateAIChat(message);
+    // 1. Credit Rating Contribution
+    const ratingScore = RATING_SCORES[bond.credit_rating] || 5;
+    score += ratingScore * WEIGHTS.CREDIT_RATING;
+
+    // 2. Yield Contribution (Generic assumption: > 8% is good)
+    const yieldScore = Math.min(10, (bond.coupon_rate / 8) * 5);
+    score += yieldScore * WEIGHTS.YIELD;
+
+    // 3. Risk Contribution (Low risk is good)
+    const riskScore = bond.risk_category === 'low' ? 10 :
+        bond.risk_category === 'medium' ? 6 : 2;
+    score += riskScore * WEIGHTS.RISK;
+
+    // 4. Maturity Contribution (Shorter maturity often preferred)
+    // This is a simplification
+    score += 6 * WEIGHTS.MATURITY;
+
+    return parseFloat(score.toFixed(1));
 };
 
-function simulateAIChat(message) {
+const analyzeBond = async (bond) => {
+    const riskScore = calculateRiskScore(bond);
+    const recommendationScore = calculateRecommendationScore(bond);
+
+    let sentiment = 'neutral';
+    if (recommendationScore > 7.5) sentiment = 'bullish';
+    else if (recommendationScore < 4) sentiment = 'bearish';
+
+    return {
+        risk_score: riskScore,
+        expected_returns: bond.coupon_rate, // Simplified: yield = coupon
+        recommendation_score: recommendationScore,
+        market_sentiment: sentiment
+    };
+};
+
+// Simple chat simulation for now
+const chat = async (message) => {
     const msg = message.toLowerCase();
 
-    // Financial Intelligence Simulation
     if (msg.includes('risk') || msg.includes('safe')) {
-        return {
-            reply: "For a conservative risk profile, I recommend Government Bonds (G-Secs) or AAA-rated Corporate Bonds like NHAI or REC. They offer 7-8% returns with high safety coverage."
-        };
+        return { reply: "For conservative investors, I recommend AAA-rated bonds like NHAI or REC." };
     }
-    if (msg.includes('return') || msg.includes('profit') || msg.includes('yield')) {
-        return {
-            reply: "Currently, Corporate Bonds in the Infrastructure sector are offering the highest yields (9-11%). However, always check the credit rating. 'Adani Green' and 'L&T Finance' are popular high-yield options on our platform."
-        };
-    }
-    if (msg.includes('tax') || msg.includes('free')) {
-        return {
-            reply: "Tax-Free Bonds (like IRFC or PFC) are excellent for high tax bracket investors. The effective pre-tax yield can be as high as 12% compared to FDs."
-        };
-    }
-    if (msg.includes('rebalance') || msg.includes('portfolio')) {
-        return {
-            reply: "I can help you rebalance. Based on current market volatility, shifting 15% from Equity-linked bonds to Fixed G-Secs is recommended to stabilize your portfolio."
-        };
-    }
-    if (msg.includes('hello') || msg.includes('hi')) {
-        return {
-            reply: "Hello! I am your AI Investment Assistant. Ask me about bond yields, risk assessment, or portfolio optimization."
-        };
+    if (msg.includes('return') || msg.includes('profit')) {
+        return { reply: "High-yield options currently offer 9-11% returns, but carry higher risk." };
     }
 
-    // Default Fallback
-    return {
-        reply: "That's an interesting market query. To give you the best advice, I'd suggest looking at our 'Marketplace' for the latest yield curves. Generally, diversifying across Govt and AAA Corporate bonds is the safest strategy right now."
-    };
-}
+    return { reply: "I can help you analyze bonds and optimize your portfolio. Ask me about specific bonds or market trends." };
+};
 
-/**
- * Generates a realistic-looking analysis based on bond data.
- */
-function simulateAIAnalysis(bond) {
-    const isGreen = bond.category === 'green';
-    const isHighYield = bond.expected_returns > 10;
-
-    const sentiment = isHighYield ? "Positive but Risky" : "Safe & Stable";
-    const score = isGreen ? 92 : (isHighYield ? 78 : 88);
-
-    const analysisText = `
-### 🤖 AI Investment Verdict: **${sentiment}**
-
-**Score: ${score}/100**
-
-**Why this bond?**
-${bond.name} offers a **${bond.expected_returns}% yield**, which is ${isHighYield ? 'significantly higher' : 'competitive'} compared to the current inflation rate of 5.5%. 
-${isGreen ? '✅ **ESG Impact**: This is a Green Bond. Investment directly funds sustainable infrastructure, qualifying for potential tax benefits.' : ''}
-
-**Risk Assessment:**
-- **Credit Risk**: ${bond.risk_category.toUpperCase()}.
-- **Liquidity**: High demand in secondary markets.
-- **Interest Rate Sensitivity**: Moderate.
-
-**Recommendation:**
-${isHighYield
-            ? `Aggressive investors should **BUY** for yield maximization. Conservative investors should limit exposure to 10% of portfolio.`
-            : `Strongly recommended for **Conservative Portfolios** seeking capital preservation.`}
-  `;
-
-    return {
-        success: true,
-        data: {
-            analysis: analysisText.trim(),
-            score: score,
-            sentiment: sentiment,
-            tags: isHighYield ? ['High Yield', 'Volatile'] : ['Stable', 'Long Term']
-        }
-    };
-}
+module.exports = {
+    analyzeBond,
+    chat
+};

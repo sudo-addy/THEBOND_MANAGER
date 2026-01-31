@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, AlertTriangle, ExternalLink, Bot, Bookmark, Share2 } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Bot, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

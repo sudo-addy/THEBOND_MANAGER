@@ -2,6 +2,11 @@ const fs = require('fs');
 
 try {
   require('dotenv').config();
+
+  // Validate environment variables before starting
+  const { validateEnv } = require('./utils/envValidator');
+  validateEnv();
+
   const express = require('express');
   const cors = require('cors');
   const mongoose = require('mongoose');
@@ -47,10 +52,12 @@ try {
   app.use(performanceMonitor); // Performance Monitoring
   app.use(rateLimiter); // Rate Limiting
 
-  // Database connection
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bond_platform')
-    .then(() => console.log('✓ MongoDB connected'))
-    .catch(err => console.error('✗ MongoDB connection error:', err));
+  // Database connection - Only connect if not in test mode
+  if (process.env.NODE_ENV !== 'test') {
+    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bond_platform')
+      .then(() => console.log('✓ MongoDB connected'))
+      .catch(err => console.error('✗ MongoDB connection error:', err));
+  }
 
   // Routes
   app.use('/api/v1/auth', authRoutes);
@@ -92,11 +99,42 @@ try {
   });
 
   const PORT = process.env.PORT || 3210;
-  httpServer.listen(PORT, () => {
-    console.log(`\n🚀 Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 WebSocket enabled\n`);
-  });
+
+  // Only listen if not in test mode
+  if (process.env.NODE_ENV !== 'test') {
+    httpServer.listen(PORT, () => {
+      console.log(`\n🚀 Server running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔗 WebSocket enabled\n`);
+    });
+
+    // Graceful shutdown handling
+    const gracefulShutdown = (signal) => {
+      console.log(`\n⚠️  ${signal} received. Starting graceful shutdown...`);
+
+      httpServer.close(() => {
+        console.log('✓ HTTP server closed');
+
+        // Close MongoDB connection
+        mongoose.connection.close(false).then(() => {
+          console.log('✓ MongoDB connection closed');
+          process.exit(0);
+        }).catch((err) => {
+          console.error('✗ Error closing MongoDB:', err);
+          process.exit(1);
+        });
+      });
+
+      // Force close after 10 seconds
+      setTimeout(() => {
+        console.error('✗ Forced shutdown after timeout');
+        process.exit(1);
+      }, 10000);
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  }
 
   module.exports = { app, io, httpServer };
 } catch (error) {

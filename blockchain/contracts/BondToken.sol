@@ -38,7 +38,7 @@ contract BondToken is ERC20, Ownable {
         emit BondIssued(msg.sender, initialSupply * 10 ** decimals(), _maturityDate);
     }
 
-    function payCooupon(uint256 amount) public onlyOwner {
+    function payCoupon(uint256 amount) public onlyOwner {
         require(!isMature, "Bond has matured");
         emit CouponPaid(amount, block.timestamp);
     }

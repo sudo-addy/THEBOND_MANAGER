@@ -1,6 +1,0 @@
-Error [ERR_REQUIRE_ESM]: require() of ES Module /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/node_modules/uuid/dist-node/index.js from /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/routes/trading.js not supported.
-Instead change the require of index.js in /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/routes/trading.js to a dynamic import() which is available in all CommonJS modules.
-    at Object.<anonymous> (/home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/routes/trading.js:7:24)
-    at Object.<anonymous> (/home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/server.js:17:25)
-require() of ES Module /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/node_modules/uuid/dist-node/index.js from /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/routes/trading.js not supported.
-Instead change the require of index.js in /home/vinman/Downloads/CIH 3.1/CoDevians_9.12_SD_G9/backend/src/routes/trading.js to a dynamic import() which is available in all CommonJS modules.

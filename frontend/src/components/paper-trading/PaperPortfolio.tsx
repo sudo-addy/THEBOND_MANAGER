@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { usePaperTradeStore } from '@/store/paperTradeStore';
 import { useTradingStore } from '@/store/tradingStore';
-import { ArrowUpRight, ArrowDownRight, Download, TrendingUp, History, PieChart } from 'lucide-react';
+import { Download, TrendingUp, History, PieChart } from 'lucide-react';
 
 export default function PaperPortfolio() {
     const [tab, setTab] = useState<'holdings' | 'history' | 'performance'>('holdings');

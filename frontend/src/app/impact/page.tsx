@@ -1,6 +1,6 @@
 'use client';
 
-import { Building2, Leaf, Users, Globe, TrendingUp, Zap, Droplets, Train, ChevronRight } from 'lucide-react';
+import { Building2, Leaf, Users, Globe, Zap, Droplets, Train, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ImpactPage() {
@@ -81,7 +81,7 @@ export default function ImpactPage() {
               Building Tomorrow&apos;s Infrastructure Today
             </h1>
             <p className="text-xl text-slate-400">
-              Every investment on our platform contributes to sustainable development, 
+              Every investment on our platform contributes to sustainable development,
               creating lasting impact for communities across India.
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function ImpactPage() {
         <div className="py-20 px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-white mb-8 text-center">Environmental Impact Summary</h2>
-            
+
             <div className="grid md:grid-cols-3 gap-6 mb-12">
               <div className="bg-gradient-to-br from-green-900/30 to-slate-900/30 border border-green-500/20 rounded-2xl p-6 text-center">
                 <Leaf className="w-12 h-12 text-green-400 mx-auto mb-4" />
@@ -192,10 +192,10 @@ export default function ImpactPage() {
             <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-white mb-4 text-center">Our Commitment</h3>
               <p className="text-slate-400 text-center leading-relaxed">
-                We are committed to directing capital towards sustainable infrastructure that creates 
-                positive environmental and social outcomes. Every bond on our platform undergoes rigorous 
-                ESG screening to ensure alignment with our sustainability principles. By 2030, we aim to 
-                facilitate ₹10,000 Cr in green and sustainable infrastructure financing, contributing to 
+                We are committed to directing capital towards sustainable infrastructure that creates
+                positive environmental and social outcomes. Every bond on our platform undergoes rigorous
+                ESG screening to ensure alignment with our sustainability principles. By 2030, we aim to
+                facilitate ₹10,000 Cr in green and sustainable infrastructure financing, contributing to
                 India&apos;s net-zero goals and sustainable development agenda.
               </p>
             </div>

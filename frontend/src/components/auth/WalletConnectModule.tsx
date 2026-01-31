@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, ShieldCheck, ChevronRight, X, ExternalLink, Copy, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Wallet, ShieldCheck, ChevronRight, X, ExternalLink, Copy, AlertTriangle } from 'lucide-react';
 
 export default function WalletConnectModule() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function WalletConnectModule() {
         address: '0xA91...2F4B'
     };
 
-    const connectWallet = (provider: string) => {
+    const connectWallet = () => {
         setConnecting(true);
         // Simulate connection delay
         setTimeout(() => {
@@ -166,7 +166,7 @@ export default function WalletConnectModule() {
                                 ].map((wallet) => (
                                     <button
                                         key={wallet.name}
-                                        onClick={() => connectWallet(wallet.name)}
+                                        onClick={() => connectWallet()}
                                         disabled={connecting}
                                         className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition group"
                                     >

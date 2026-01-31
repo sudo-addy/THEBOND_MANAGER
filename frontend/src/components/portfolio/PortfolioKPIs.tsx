@@ -1,6 +1,6 @@
 'use client';
 
-import { TrendingUp, Wallet, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, Wallet, PieChart, ArrowUpRight } from 'lucide-react';
 
 export default function PortfolioKPIs() {
     const metrics = [

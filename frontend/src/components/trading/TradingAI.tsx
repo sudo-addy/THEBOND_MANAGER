@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, BrainCircuit, ExternalLink } from 'lucide-react';
+import { Sparkles, BrainCircuit } from 'lucide-react';
 
 export default function TradingAI() {
     return (

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePaperTradeStore } from '@/store/paperTradeStore';
 import { useTradingStore } from '@/store/tradingStore';
-import { ArrowUpRight, ArrowDownRight, RefreshCcw, ShieldCheck, Info } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, RefreshCcw, ShieldCheck } from 'lucide-react';
 
 export default function PaperTradeTerminal() {
     // Stores
@@ -130,8 +130,8 @@ export default function PaperTradeTerminal() {
                 onClick={handleExecute}
                 disabled={action === 'BUY' && !canAfford}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-xl transition transform hover:scale-[1.02] active:scale-[0.98] ${action === 'BUY'
-                        ? (canAfford ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed')
-                        : 'bg-red-600 hover:bg-red-500 text-white'
+                    ? (canAfford ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed')
+                    : 'bg-red-600 hover:bg-red-500 text-white'
                     }`}
             >
                 {action === 'BUY' ? (canAfford ? 'PLACE BUY ORDER' : 'INSUFFICIENT FUNDS') : 'PLACE SELL ORDER'}

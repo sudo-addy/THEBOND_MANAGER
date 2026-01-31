@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, QrCode, CreditCard, Banknote, CheckCircle2, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { X, QrCode, CreditCard, Banknote, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { api } from '@/services/api';
 
 interface PaymentModalProps {

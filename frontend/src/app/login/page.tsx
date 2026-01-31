@@ -1,20 +1,76 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { api } from '../../services/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Lock, User, Building2, Briefcase, ChevronRight, Wallet } from 'lucide-react';
+import { ShieldCheck, Lock, User, Building2, Briefcase, ChevronRight, Wallet, ArrowRight, HelpCircle } from 'lucide-react';
 import WalletConnectModule from '@/components/auth/WalletConnectModule';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Sphere, MeshDistortMaterial } from '@react-three/drei';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
+// --- 3D Background Component ---
+function AnimatedSphere() {
+  const meshRef = useRef<any>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.getElapsedTime() * 0.2;
+      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+    }
+  });
+
+  return (
+    <Sphere args={[1, 100, 200]} scale={2.5} ref={meshRef}>
+      <MeshDistortMaterial
+        color="#3b82f6"
+        attach="material"
+        distort={0.4}
+        speed={1.5}
+        roughness={0.2}
+        metalness={0.8}
+      />
+    </Sphere>
+  );
+}
+
+function Scene() {
+  return (
+    <Canvas className="w-full h-full">
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <AnimatedSphere />
+      <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
+    </Canvas>
+  );
+}
+
+// --- Main Component ---
 export default function LoginPage() {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState<'retail' | 'institution' | 'admin'>('retail');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // GSAP Animations
+  useGSAP(() => {
+    const tl = gsap.timeline();
+
+    tl.from('.login-content', {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out'
+    });
+  }, { scope: containerRef });
 
   const handleDemoLogin = (type: 'retail' | 'institution' | 'admin') => {
     setActiveTab(type);
@@ -37,11 +93,19 @@ export default function LoginPage() {
 
     try {
       // Simulate login for demo if backend fails or for UX speed
-      const response = await api.auth.login(email, password);
+      const response = await api.auth.login({ email, password });
 
-      localStorage.setItem('access_token', response.tokens.access_token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      router.push('/dashboard');
+      if (response.tokens?.access_token) {
+        const token = response.tokens.access_token;
+        // Store token in localStorage for API requests
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        // Set cookie for middleware authentication (7 days expiry)
+        document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        router.push('/dashboard');
+      } else {
+        throw new Error('Login successful but no token received');
+      }
     } catch (err: any) {
       console.error('Login error:', err);
       const errorMessage = err?.response?.data?.error || err.message || 'Login failed. Please check your credentials.';
@@ -52,34 +116,51 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden" ref={containerRef}>
 
-      {/* Background Ambience */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative z-10"
-      >
-        {/* Header Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition">
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">B</div>
-            <span className="text-2xl font-bold text-white tracking-tight">BondPlatform</span>
-          </Link>
-          <h2 className="text-lg text-blue-100">
-            Welcome back, <span className="font-semibold text-white">Investor</span>
-          </h2>
+      {/* Left Column - Visuals & 3D */}
+      <div className="hidden lg:flex w-1/2 bg-slate-900 border-r border-slate-800 relative flex-col justify-between overflow-hidden p-12">
+        {/* 3D Background Layer */}
+        <div className="absolute inset-0 z-0 opacity-40">
+          <Scene />
         </div>
 
-        {/* Main Dark Glass Card */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col h-full justify-between pointer-events-none">
+          <Link href="/" className="inline-flex items-center gap-2 text-white mb-12 pointer-events-auto hover:opacity-80 transition w-fit">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">M</div>
+            <span className="text-xl font-bold">MUD₹A</span>
+          </Link>
+
+          <div className="mb-20">
+            <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
+              Welcome back to <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Smart Investing</span>
+            </h2>
+            <p className="text-slate-400 text-lg max-w-md">
+              Access your portfolio, track real-time bond performance, and manage your assets with institutional-grade security.
+            </p>
+          </div>
+
+          <div className="text-xs text-slate-600">
+            © 2026 MUD₹A Platform. All rights reserved.
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 relative">
+        <div className="w-full max-w-md login-content">
+
+          <div className="text-center lg:text-left mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Sign In</h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              New here? <Link href="/signup" className="text-blue-600 font-bold hover:underline">Create an account</Link>
+            </p>
+          </div>
 
           {/* Role Tabs */}
-          <div className="flex bg-black/20 p-1 rounded-xl mb-8 relative z-10">
+          <div className="bg-slate-100 dark:bg-slate-900 p-1 rounded-xl flex mb-8">
             {[
               { id: 'retail', icon: User, label: 'Retail' },
               { id: 'institution', icon: Building2, label: 'Institution' },
@@ -88,31 +169,31 @@ export default function LoginPage() {
               <button
                 key={tab.id}
                 onClick={() => handleDemoLogin(tab.id as any)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
-                  : 'text-blue-200 hover:text-white hover:bg-white/5'
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
+                  ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
               >
-                <tab.icon className="w-3.5 h-3.5" />
-                {tab.label}
+                <tab.icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
           </div>
 
           {error && (
-            <div className="mb-6 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-sm font-medium text-center relative z-10">
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm font-medium">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+          <form onSubmit={handleSubmit} className="space-y-5 mb-8" ref={formRef}>
             <div>
-              <label className="block text-xs font-bold text-blue-200 uppercase tracking-wider mb-2">Email Address</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all font-medium"
+                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="name@example.com"
                 required
               />
@@ -120,14 +201,14 @@ export default function LoginPage() {
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-xs font-bold text-blue-200 uppercase tracking-wider">Password</label>
-                <a href="#" className="text-xs font-semibold text-blue-300 hover:text-white transition">Forgot?</a>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Password</label>
+                <a href="#" className="text-xs font-semibold text-blue-600 hover:text-blue-700">Forgot Password?</a>
               </div>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all font-medium"
+                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
                 required
               />
@@ -136,40 +217,36 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-900/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? 'Signing in...' : 'Sign In Securely'} <ChevronRight className="w-4 h-4" />
+              {loading ? 'Signing in...' : 'Sign In'} <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          <div className="my-6 flex items-center gap-4 relative z-10">
-            <div className="h-px flex-1 bg-white/10"></div>
-            <span className="text-xs text-blue-300 font-medium">OR</span>
-            <div className="h-px flex-1 bg-white/10"></div>
+          <div className="my-8 flex items-center gap-4">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+            <span className="text-xs text-slate-400 font-medium">OR CONNECT WITH</span>
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
           </div>
 
           <WalletConnectModule />
-        </div>
 
-        {/* Footer & Trust */}
-        <div className="mt-8 text-center space-y-4">
-          <p className="text-sm text-blue-200">
-            Don't have an account? <Link href="/signup" className="text-white font-bold hover:underline">Get Started</Link>
-          </p>
-
-          <div className="flex justify-center items-center gap-4 opacity-70">
+          {/* Compliance Trust Strip */}
+          <div className="flex justify-center items-center gap-6 mt-12 opacity-70">
             <div className="flex items-center gap-1.5 grayscale hover:grayscale-0 transition">
-              <ShieldCheck className="w-4 h-4 text-green-400" />
-              <span className="text-[10px] font-bold text-blue-200">SEBI Compliant</span>
+              <ShieldCheck className="w-4 h-4 text-green-500" />
+              <span className="text-[10px] font-bold text-slate-500">SEBI Compliant</span>
             </div>
-            <div className="w-1 h-1 rounded-full bg-blue-400" />
+            <div className="w-1 h-1 rounded-full bg-slate-300" />
             <div className="flex items-center gap-1.5 grayscale hover:grayscale-0 transition">
-              <Lock className="w-3.5 h-3.5 text-blue-300" />
-              <span className="text-[10px] font-bold text-blue-200">256-bit Encrypted</span>
+              <Lock className="w-3.5 h-3.5 text-blue-500" />
+              <span className="text-[10px] font-bold text-slate-500">256-bit Encrypted</span>
             </div>
           </div>
+
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
+

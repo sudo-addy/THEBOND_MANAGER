@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Briefcase, MapPin, Clock, ChevronRight, Code, TrendingUp, Shield, Users, Zap, Heart } from 'lucide-react';
+import { Briefcase, MapPin, Clock, ChevronRight, TrendingUp, Shield, Users, Zap, Heart, Star } from 'lucide-react';
 import Link from 'next/link';
 
 interface Job {
@@ -103,8 +103,8 @@ export default function CareersPage() {
 
   const departments = ['all', 'Engineering', 'Data Science', 'Product', 'Legal', 'Design'];
 
-  const filteredJobs = selectedDepartment === 'all' 
-    ? jobs 
+  const filteredJobs = selectedDepartment === 'all'
+    ? jobs
     : jobs.filter(job => job.department === selectedDepartment);
 
   return (
@@ -128,7 +128,7 @@ export default function CareersPage() {
               Build the Future of Finance
             </h1>
             <p className="text-xl text-slate-400 mb-8">
-              Join our mission to democratize infrastructure investment. We&apos;re looking for 
+              Join our mission to democratize infrastructure investment. We&apos;re looking for
               passionate individuals who want to revolutionize the fixed-income market.
             </p>
             <div className="flex gap-4 justify-center">
@@ -155,7 +155,9 @@ export default function CareersPage() {
               <div className="text-sm text-slate-500">Remote Team</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white">4.8★</div>
+              <div className="text-3xl font-bold text-white flex items-center justify-center gap-1">
+                4.8 <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+              </div>
               <div className="text-sm text-slate-500">Glassdoor Rating</div>
             </div>
           </div>
@@ -194,11 +196,10 @@ export default function CareersPage() {
                 <button
                   key={dept}
                   onClick={() => setSelectedDepartment(dept)}
-                  className={`px-4 py-2 rounded-full text-sm font-bold transition ${
-                    selectedDepartment === dept
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-800 text-slate-400 hover:text-white'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition ${selectedDepartment === dept
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
                 >
                   {dept === 'all' ? 'All Departments' : dept}
                 </button>
@@ -254,7 +255,7 @@ export default function CareersPage() {
             <p className="text-slate-400 mb-6">
               We&apos;re always looking for talented individuals. Send us your resume and we&apos;ll keep you in mind for future opportunities.
             </p>
-            <a 
+            <a
               href="mailto:careers@bondplatform.gov"
               className="inline-block px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition"
             >

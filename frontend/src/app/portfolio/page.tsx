@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, LogOut, Menu, Search, Sparkles } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import PortfolioKPIs from '@/components/portfolio/PortfolioKPIs';
 import PortfolioCharts from '@/components/portfolio/PortfolioCharts';

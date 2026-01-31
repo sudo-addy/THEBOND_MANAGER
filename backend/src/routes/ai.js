@@ -30,11 +30,12 @@ router.get('/analyze/:bondId', async (req, res) => {
         }
 
         // 2. Call AI Service
+        // 2. Call AI Service
         const analysis = await aiService.analyzeBond(bond);
 
         res.json({
             success: true,
-            data: analysis.data
+            analytics: analysis
         });
 
     } catch (error) {

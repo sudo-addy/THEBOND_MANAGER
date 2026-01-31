@@ -2,7 +2,7 @@
 
 import { Check, Zap, Crown, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export function PricingSection() {
     const [isAnnual, setIsAnnual] = useState(false);
@@ -104,7 +104,7 @@ export function PricingSection() {
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{tier.description}</p>
                             </div>
 
-                            <button className={`w-full py-3 rounded-xl font-bold transition mb-8 
+                            <button className={`w-full py-3 rounded-xl font-bold transition mb-8
                 ${tier.highlight
                                     ? (tier.color === 'purple'
                                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:shadow-purple-500/25'

@@ -8,6 +8,7 @@ import {
   Search, Filter, ArrowUpRight, Clock, Lock, ShieldCheck,
   BarChart3, Zap
 } from 'lucide-react';
+import { api } from '@/services/api';
 
 // Enhanced Bond Interface
 interface Bond {
@@ -214,6 +215,7 @@ export default function BondsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Stats
   const stats = [
@@ -224,13 +226,50 @@ export default function BondsPage() {
   ];
 
   useEffect(() => {
-    // Simulate API Fetch with a small delay for effect
-    const timer = setTimeout(() => {
-      setBonds(MOCK_BONDS);
-      setFilteredBonds(MOCK_BONDS);
-      setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    // Check if logged in
+    const user = localStorage.getItem('user');
+    setIsLoggedIn(!!user);
+
+    // Fetch bonds from API with fallback to mock data
+    const fetchBonds = async () => {
+      try {
+        const response: any = await api.bonds.list();
+
+        if (response.success && response.bonds && response.bonds.length > 0) {
+          // Map API response to our interface
+          const apiBonds = response.bonds.map((bond: any) => ({
+            _id: bond._id,
+            name: bond.name,
+            issuer: bond.issuer,
+            coupon_rate: bond.coupon_rate,
+            expected_returns: bond.expected_returns || bond.coupon_rate * 1.15,
+            risk_category: bond.risk_category,
+            category: bond.category || 'govt',
+            current_price: bond.current_price || 1000,
+            token_price: bond.token_price || 500,
+            funding_goal: bond.funding_goal || 1000000000,
+            funding_raised: bond.funding_raised || 500000000,
+            maturity_date: bond.maturity_date,
+            infra_score: bond.infra_score || 85,
+            verified_status: bond.verified_status !== false
+          }));
+          setBonds(apiBonds);
+          setFilteredBonds(apiBonds);
+        } else {
+          // Fallback to mock data
+          setBonds(MOCK_BONDS);
+          setFilteredBonds(MOCK_BONDS);
+        }
+      } catch (error) {
+        console.log('Using mock data - API unavailable');
+        setBonds(MOCK_BONDS);
+        setFilteredBonds(MOCK_BONDS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBonds();
   }, []);
 
   // Filter Logic
@@ -430,13 +469,26 @@ export default function BondsPage() {
                   {/* Actions */}
                   <div className="flex gap-3 relative z-10">
                     <button
-                      onClick={() => router.push('/login')}
+                      onClick={() => {
+                        if (isLoggedIn) {
+                          // Redirect to trading with bond context
+                          router.push(`/trading?bond=${bond._id}`);
+                        } else {
+                          router.push('/login');
+                        }
+                      }}
                       className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 transition hover:shadow-blue-600/30 flex items-center justify-center gap-2"
                     >
-                      Buy Token <ArrowUpRight className="w-4 h-4" />
+                      {isLoggedIn ? 'Trade Now' : 'Buy Token'} <ArrowUpRight className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => router.push('/login')}
+                      onClick={() => {
+                        if (isLoggedIn) {
+                          router.push(`/trading?bond=${bond._id}`);
+                        } else {
+                          router.push('/login');
+                        }
+                      }}
                       className="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition flex items-center justify-center"
                     >
                       <TrendingUp className="w-4 h-4" />

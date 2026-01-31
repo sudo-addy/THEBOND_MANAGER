@@ -1,7 +1,7 @@
 'use client';
 
 import { usePaperTradeStore } from '@/store/paperTradeStore';
-import { Wallet, TrendingUp, AlertCircle, PieChart } from 'lucide-react';
+import { Wallet, TrendingUp, PieChart } from 'lucide-react';
 
 export default function PaperWalletOverview() {
     const { currentBalance, portfolioValue } = usePaperTradeStore();

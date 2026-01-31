@@ -1,6 +1,6 @@
 'use client';
 
-import { Twitter, Newspaper, ArrowUp } from 'lucide-react';
+import { Twitter, Newspaper } from 'lucide-react';
 
 export default function SentimentAnalysis() {
     return (

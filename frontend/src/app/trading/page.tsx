@@ -8,8 +8,7 @@ import OrderEntryPanel from '@/components/trading/OrderEntryPanel';
 import RecentTrades from '@/components/trading/RecentTrades';
 import ActivePosition from '@/components/trading/ActivePosition';
 import TradingAI from '@/components/trading/TradingAI';
-import TokenizationTracker from '@/components/dashboard/TokenizationTracker';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -18,7 +17,7 @@ import { useTradingStore } from '@/store/tradingStore';
 export default function TradingPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const { simulateMarket } = useTradingStore();
+    const { simulateMarket, checkDemoMode } = useTradingStore();
 
     useEffect(() => {
         // Auth check
@@ -26,12 +25,15 @@ export default function TradingPage() {
         if (!user) router.push('/login');
         setLoading(false);
 
+        // Check demo mode
+        checkDemoMode();
+
         // Start Simulation
         const cleanup = simulateMarket();
         return () => {
             if (typeof cleanup === 'function') cleanup();
         }
-    }, [router, simulateMarket]);
+    }, [router, simulateMarket, checkDemoMode]);
 
     if (loading) return null;
 
@@ -72,7 +74,7 @@ export default function TradingPage() {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] text-slate-400">Blockchain</p>
-                                    <p className="text-xs font-bold text-green-400">Verified ✅</p>
+                                    <p className="text-xs font-bold text-green-400 flex items-center justify-end gap-1">Verified <CheckCircle className="w-3 h-3" /></p>
                                 </div>
                             </div>
                             <TradingAI />

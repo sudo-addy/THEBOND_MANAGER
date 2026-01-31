@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Filter, TrendingUp } from 'lucide-react';
+import { Search, TrendingUp } from 'lucide-react';
 import { useTradingStore } from '@/store/tradingStore';
 import { useEffect, useState } from 'react';
 

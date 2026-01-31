@@ -28,10 +28,12 @@ redisClient.on('connect', () => {
 
 // Attempt connection but don't block
 (async () => {
-    try {
-        await redisClient.connect();
-    } catch (err) {
-        console.log('⚠️ Redis Connection Failed. Running without cache.');
+    if (process.env.NODE_ENV !== 'test') {
+        try {
+            await redisClient.connect();
+        } catch (err) {
+            console.log('⚠️ Redis Connection Failed. Running without cache.');
+        }
     }
 })();
 

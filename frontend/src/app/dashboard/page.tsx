@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, LogOut, Bell, Menu, Users, Activity, Database, ShieldAlert, Award } from 'lucide-react';
+import { Search, Users, Activity, Database, ShieldAlert, Award } from 'lucide-react';
 
 // Components
 import NavigationSidebarPro from '@/components/dashboard/NavigationSidebarPro';

@@ -84,9 +84,9 @@ export default function DisclaimerPage() {
             <div>
               <h3 className="font-bold text-amber-400 mb-2">Important Notice</h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                Investing in tokenized infrastructure bonds involves significant risks, including the 
-                potential loss of your entire investment. You should carefully consider your investment 
-                objectives, experience level, and risk appetite before investing. If you have any doubts, 
+                Investing in tokenized infrastructure bonds involves significant risks, including the
+                potential loss of your entire investment. You should carefully consider your investment
+                objectives, experience level, and risk appetite before investing. If you have any doubts,
                 you should seek advice from an independent financial advisor.
               </p>
             </div>
@@ -118,10 +118,10 @@ export default function DisclaimerPage() {
           <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">No Investment Advice</h2>
             <p className="text-slate-400 leading-relaxed">
-              The information provided on this Platform is for general informational purposes only and 
-              does not constitute investment advice, financial advice, trading advice, or any other sort 
-              of advice. You should not treat any of the Platform&apos;s content as such. We do not recommend 
-              that any bond or token should be bought, sold, or held by you. Nothing on this Platform should 
+              The information provided on this Platform is for general informational purposes only and
+              does not constitute investment advice, financial advice, trading advice, or any other sort
+              of advice. You should not treat any of the Platform&apos;s content as such. We do not recommend
+              that any bond or token should be bought, sold, or held by you. Nothing on this Platform should
               be taken as an offer to buy, sell, or hold any bond or token.
             </p>
           </div>
@@ -129,10 +129,10 @@ export default function DisclaimerPage() {
           <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">AI-Generated Insights</h2>
             <p className="text-slate-400 leading-relaxed">
-              Our Platform uses artificial intelligence to provide investment insights, risk assessments, 
-              and recommendations. While our AI systems are designed to be helpful, they may produce 
-              inaccurate or incomplete information. AI-generated content should not be relied upon as the 
-              sole basis for investment decisions. Always conduct your own research and consult with 
+              Our Platform uses artificial intelligence to provide investment insights, risk assessments,
+              and recommendations. While our AI systems are designed to be helpful, they may produce
+              inaccurate or incomplete information. AI-generated content should not be relied upon as the
+              sole basis for investment decisions. Always conduct your own research and consult with
               qualified professionals before making investment decisions.
             </p>
           </div>
@@ -140,7 +140,7 @@ export default function DisclaimerPage() {
           <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Tokenization Risks</h2>
             <p className="text-slate-400 leading-relaxed">
-              Tokenized securities represent a new form of financial instrument that combines traditional 
+              Tokenized securities represent a new form of financial instrument that combines traditional
               securities with blockchain technology. Additional risks include:
             </p>
             <ul className="mt-4 space-y-2 text-slate-400">
@@ -155,7 +155,7 @@ export default function DisclaimerPage() {
           <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Suitability</h2>
             <p className="text-slate-400 leading-relaxed">
-              Before investing, you should consider whether trading or holding tokenized bonds is suitable 
+              Before investing, you should consider whether trading or holding tokenized bonds is suitable
               for you based on your:
             </p>
             <ul className="mt-4 space-y-2 text-slate-400">
@@ -170,9 +170,9 @@ export default function DisclaimerPage() {
           <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Regulatory Compliance</h2>
             <p className="text-slate-400 leading-relaxed">
-              Our Platform operates under the regulatory framework established by SEBI and RBI. We are 
-              committed to maintaining full compliance with all applicable laws and regulations. However, 
-              the regulatory landscape for tokenized securities is evolving, and future regulatory changes 
+              Our Platform operates under the regulatory framework established by SEBI and RBI. We are
+              committed to maintaining full compliance with all applicable laws and regulations. However,
+              the regulatory landscape for tokenized securities is evolving, and future regulatory changes
               may affect the availability, trading, or value of tokens on our Platform.
             </p>
           </div>

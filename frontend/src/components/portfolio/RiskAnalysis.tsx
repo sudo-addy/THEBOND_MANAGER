@@ -1,6 +1,6 @@
 'use client';
 
-import { ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle } from 'lucide-react';
 
 export default function RiskAnalysis() {
     return (

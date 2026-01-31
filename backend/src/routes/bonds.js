@@ -2,11 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const Bond = require('../models/Bond');
-
 const redisClient = require('../utils/redisClient');
+const { validate } = require('../middleware/validation');
+const { createBondValidation, bondQueryValidation } = require('../middleware/validationSchemas');
+const { adminMiddleware } = require('../middleware/rbac');
 
 // Get all bonds with filters
-router.get('/', async (req, res) => {
+/**
+ * @route GET /api/v1/bonds
+ * @desc Get all bonds with optional filters (risk, maturity) and pagination
+ * @access Public
+ * @param {string} [risk] - Filter by risk category (e.g., 'low', 'medium', 'high')
+ * @param {number} [limit=20] - Number of items per page
+ * @param {number} [page=1] - Page number
+ * @returns {Object} List of bonds and pagination metadata
+ */
+router.get('/', validate(bondQueryValidation), async (req, res) => {
   try {
     const { risk, maturity, limit = 20, page = 1 } = req.query;
 
@@ -20,7 +31,6 @@ router.get('/', async (req, res) => {
         return res.json(JSON.parse(cachedData));
       }
     } catch (err) {
-      // Wrapper suppresses connection errors, so this catches other JSON parsing errors etc.
       console.warn('Cache fetch skipped:', err.message);
     }
 
@@ -60,6 +70,13 @@ router.get('/', async (req, res) => {
 });
 
 // Get bond by ID
+/**
+ * @route GET /api/v1/bonds/:id
+ * @desc Get detailed information for a specific bond
+ * @access Public
+ * @param {string} id - Bond ID
+ * @returns {Object} Bond details
+ */
 router.get('/:id', async (req, res) => {
   try {
     const bond = await Bond.findById(req.params.id);
@@ -73,6 +90,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // Get AI recommendations for bond
+/**
+ * @route GET /api/v1/bonds/:id/analytics
+ * @desc Get AI-driven analytics and recommendations for a bond
+ * @access Public
+ * @param {string} id - Bond ID
+ * @returns {Object} Analytics data including risk score and market sentiment
+ */
 router.get('/:id/analytics', async (req, res) => {
   try {
     const bond = await Bond.findById(req.params.id);
@@ -80,6 +104,7 @@ router.get('/:id/analytics', async (req, res) => {
       return res.status(404).json({ error: 'Bond not found' });
     }
 
+    // TODO: Replace with real AI service
     res.json({
       success: true,
       analytics: {
@@ -95,7 +120,14 @@ router.get('/:id/analytics', async (req, res) => {
 });
 
 // Create bond (admin only)
-router.post('/', authMiddleware, async (req, res) => {
+/**
+ * @route POST /api/v1/bonds
+ * @desc Create a new bond listing
+ * @access Private (Admin only)
+ * @body {Object} bondData - Bond details (name, issuer, coupon_rate, etc.)
+ * @returns {Object} Created bond object
+ */
+router.post('/', authMiddleware, adminMiddleware, validate(createBondValidation), async (req, res) => {
   try {
     const bond = new Bond(req.body);
     await bond.save();

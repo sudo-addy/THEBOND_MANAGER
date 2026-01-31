@@ -1,6 +1,6 @@
 'use client';
 
-import { ShieldCheck, Lock, FileCheck, Server, AlertCircle, CheckCircle, ChevronRight, X } from 'lucide-react';
+import { ShieldCheck, Lock, FileCheck, Server, CheckCircle, ChevronRight, X } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

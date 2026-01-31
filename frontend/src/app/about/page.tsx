@@ -89,9 +89,9 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-white mb-6 text-center">Our Mission</h2>
             <p className="text-lg text-slate-400 text-center leading-relaxed">
-              To democratize access to infrastructure investments by leveraging blockchain technology 
+              To democratize access to infrastructure investments by leveraging blockchain technology
               for transparency, fractional ownership for accessibility, and AI for intelligent decision-making.
-              We believe every investor, regardless of their capital, should have access to stable, 
+              We believe every investor, regardless of their capital, should have access to stable,
               high-quality fixed-income opportunities that build nations.
             </p>
           </div>

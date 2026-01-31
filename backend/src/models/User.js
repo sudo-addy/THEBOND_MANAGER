@@ -19,6 +19,32 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   phone: String,
+  profilePicture: {
+    type: String, // Base64 encoded image or URL
+    default: ''
+  },
+  bio: {
+    type: String,
+    maxlength: 500,
+    default: ''
+  },
+  location: {
+    type: String,
+    default: ''
+  },
+  company: {
+    type: String,
+    default: ''
+  },
+  website: {
+    type: String,
+    default: ''
+  },
+  socialLinks: {
+    twitter: { type: String, default: '' },
+    linkedin: { type: String, default: '' },
+    github: { type: String, default: '' }
+  },
   kyc_status: {
     type: String,
     enum: ['pending', 'verified', 'rejected'],
@@ -30,6 +56,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['free', 'basic', 'premium', 'enterprise'],
     default: 'free'
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'issuer'],
+    default: 'user'
   },
   subscription_expiry: Date,
   api_key: String,
@@ -50,9 +81,9 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -63,12 +94,12 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(password) {
+userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
 // Remove sensitive fields from response
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   delete obj.api_secret;

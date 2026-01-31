@@ -1,5 +1,8 @@
 'use client';
 
+import Link from 'next/link';
+import { Mail, Phone, Building } from 'lucide-react';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -12,19 +15,19 @@ export default function Footer() {
             <h4 className="font-semibold text-white mb-3">About</h4>
             <ul className="text-xs text-blue-300 space-y-1.5">
               <li>
-                <a href="#" className="hover:text-white transition">
+                <Link href="/about" className="hover:text-white transition">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
-                  How It Works
-                </a>
+                <Link href="/impact" className="hover:text-white transition">
+                  Impact Report
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
-                  Our Mission
-                </a>
+                <Link href="/careers" className="hover:text-white transition">
+                  Careers
+                </Link>
               </li>
             </ul>
           </div>
@@ -34,19 +37,19 @@ export default function Footer() {
             <h4 className="font-semibold text-white mb-3">Support</h4>
             <ul className="text-xs text-blue-300 space-y-1.5">
               <li>
-                <a href="#" className="hover:text-white transition">
+                <Link href="/contact" className="hover:text-white transition">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
+                <Link href="/contact" className="hover:text-white transition">
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
-                  FAQs
-                </a>
+                <Link href="/demo" className="hover:text-white transition">
+                  Demo
+                </Link>
               </li>
             </ul>
           </div>
@@ -56,19 +59,19 @@ export default function Footer() {
             <h4 className="font-semibold text-white mb-3">Legal</h4>
             <ul className="text-xs text-blue-300 space-y-1.5">
               <li>
-                <a href="#" className="hover:text-white transition">
+                <Link href="/terms" className="hover:text-white transition">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
+                <Link href="/privacy" className="hover:text-white transition">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
-                  Compliance
-                </a>
+                <Link href="/disclaimer" className="hover:text-white transition">
+                  Risk Disclosure
+                </Link>
               </li>
             </ul>
           </div>
@@ -77,9 +80,9 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-white mb-3">Contact</h4>
             <ul className="text-xs text-blue-300 space-y-1.5">
-              <li>📧 support@bondmarket.gov</li>
-              <li>📞 +1-800-BONDS-01</li>
-              <li>🏢 Federal Building, Suite 100</li>
+              <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> support@bondmarket.gov</li>
+              <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> +1-800-BONDS-01</li>
+              <li className="flex items-center gap-2"><Building className="w-4 h-4" /> Federal Building, Suite 100</li>
             </ul>
           </div>
         </div>

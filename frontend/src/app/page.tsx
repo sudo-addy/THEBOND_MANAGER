@@ -2,15 +2,18 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Leaf, Building2, TrendingUp } from 'lucide-react';
 import { TrustBadges } from '../components/landing/TrustBadges';
 import { FeaturedProjects } from '../components/landing/FeaturedProjects';
 import { TokenizationExplainer } from '../components/landing/TokenizationExplainer';
 import { ImpactDashboard } from '../components/landing/ImpactDashboard';
 import { PricingSection } from '../components/landing/PricingSection';
 import { SaturnRing } from '../components/animations/SaturnRing';
+
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 
 // Animation variants
@@ -32,9 +35,15 @@ const staggerContainer = {
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [currentTvl, setCurrentTvl] = useState("₹1,24,50,000");
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setMounted(true);
+
+    // Register GSAP plugins
+    if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+    }
 
     // Dynamic TVL updates every 5 seconds
     const interval = setInterval(() => {
@@ -78,12 +87,12 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section (Keep existing but cleaner) */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Abstract Background Elements */}
+      {/* Hero Section with GSAP animations */}
+      <section ref={heroRef} className="relative pt-32 pb-20 px-4 overflow-hidden bg-gradient-mesh">
+        {/* Enhanced Abstract Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-          <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-blue-100/40 dark:bg-blue-900/10 blur-[120px]" />
-          <div className="absolute top-[40%] -left-[10%] w-[600px] h-[600px] rounded-full bg-indigo-100/40 dark:bg-indigo-900/10 blur-[120px]" />
+          <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-blue-500/20 dark:bg-blue-500/10 blur-[150px] animate-pulse" />
+          <div className="absolute top-[40%] -left-[10%] w-[600px] h-[600px] rounded-full bg-purple-500/15 dark:bg-purple-500/8 blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
@@ -144,8 +153,8 @@ export default function Home() {
                     <p className="text-sm text-slate-500 dark:text-slate-400">Total Value Locked</p>
                     <h3 className="text-2xl font-bold dark:text-white transition-all duration-500">{currentTvl}</h3>
                   </div>
-                  <div className="text-green-500 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full text-sm font-bold">
-                    +12.5% 📈
+                  <div className="text-green-500 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+                    +12.5% <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
                 <div className="space-y-4">
@@ -182,17 +191,17 @@ export default function Home() {
             <motion.div
               animate={{ y: [0, -20, 0] }}
               transition={{ repeat: Infinity, duration: 4 }}
-              className="absolute -top-10 -right-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20"
+              className="absolute -top-10 -right-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20 flex flex-col items-center"
             >
-              <span className="text-3xl">🌿</span>
+              <Leaf className="w-8 h-8 text-green-500 mb-1" />
               <div className="text-xs font-bold mt-1 dark:text-white">Green Bonds</div>
             </motion.div>
             <motion.div
               animate={{ y: [0, 20, 0] }}
               transition={{ repeat: Infinity, duration: 5 }}
-              className="absolute -bottom-10 -left-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20"
+              className="absolute -bottom-10 -left-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20 flex flex-col items-center"
             >
-              <span className="text-3xl">🏙️</span>
+              <Building2 className="w-8 h-8 text-blue-500 mb-1" />
               <div className="text-xs font-bold mt-1 dark:text-white">Smart Cities</div>
             </motion.div>
           </motion.div>

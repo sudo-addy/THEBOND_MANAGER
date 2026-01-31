@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, ArrowUpRight, PieChart, Calendar, Download } from 'lucide-react';
+import { TrendingUp, ArrowUpRight, PieChart, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useState } from 'react';
 
@@ -79,8 +79,8 @@ export default function PortfolioPerformanceChart({ data }: PortfolioPerformance
                                 key={range}
                                 onClick={() => setTimeRange(range)}
                                 className={`px-3 py-1 text-xs font-bold rounded-md transition ${timeRange === range
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-blue-600 text-white shadow-lg'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {range}

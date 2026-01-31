@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, User, Sparkles, MoreHorizontal } from 'lucide-react';
+import { X, Send, Sparkles, MoreHorizontal } from 'lucide-react';
 import { api } from '@/services/api';
 
 interface AIChatModalProps {
@@ -51,7 +51,7 @@ export default function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
             const errorMsg: Message = {
                 id: Date.now() + 1,
                 role: 'bot',
-                text: `⚠️ **System Error**: ${msg}. \n\nCheck if Backend is running on Port 3210.`
+                text: `Error: **System Error**: ${msg}. \n\nCheck if Backend is running on Port 3210.`
             };
             setMessages(prev => [...prev, errorMsg]);
         } finally {

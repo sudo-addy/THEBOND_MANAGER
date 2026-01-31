@@ -1,19 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowRight, Wallet, Clock, Lock, CheckCircle } from 'lucide-react';
+import { ArrowRight, Wallet, Clock, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useTradingStore } from '@/store/tradingStore';
 
 export default function OrderEntryPanel() {
-    const { currentPrice, executeOrder } = useTradingStore();
+    const { currentPrice, executeOrder, checkDemoMode, walletBalance, fetchPortfolio, fetchBonds } = useTradingStore();
 
     const [side, setSide] = useState<'buy' | 'sell'>('buy');
     const [type, setType] = useState<'market' | 'limit'>('limit');
     const [qty, setQty] = useState<number>(10);
     const [limitPrice, setLimitPrice] = useState<number>(currentPrice);
     const [successMsg, setSuccessMsg] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDemo, setIsDemo] = useState(true);
 
-    // Update limit price default when market moves, only if user hasn't edited it manually? 
+    useEffect(() => {
+        const isDemo = checkDemoMode();
+        setIsDemo(isDemo);
+        if (!isDemo) {
+            fetchPortfolio();
+            fetchBonds();
+        }
+    }, [checkDemoMode, fetchPortfolio, fetchBonds]);
+
+    // Update limit price default when market moves, only if user hasn't edited it manually?
     // For simplicity, let's keep it manual or sync on mount.
     useEffect(() => {
         if (type === 'market') {
@@ -25,11 +37,26 @@ export default function OrderEntryPanel() {
     const total = qty * finalPrice;
     const fees = total * 0.001; // 0.1% fee
 
-    const handleOrder = () => {
-        executeOrder(side, qty, finalPrice);
-        setSuccessMsg(`Successfully ${side === 'buy' ? 'bought' : 'sold'} ${qty} units at ₹${finalPrice.toFixed(2)}`);
+    const handleOrder = async () => {
+        setIsLoading(true);
+        setErrorMsg('');
 
-        setTimeout(() => setSuccessMsg(''), 3000);
+        try {
+            const result = await executeOrder(side, qty, finalPrice);
+
+            if (result.success) {
+                setSuccessMsg(result.message || `Successfully ${side === 'buy' ? 'bought' : 'sold'} ${qty} units at ₹${finalPrice.toFixed(2)}`);
+                setTimeout(() => setSuccessMsg(''), 3000);
+            } else {
+                setErrorMsg(result.message || 'Order failed');
+                setTimeout(() => setErrorMsg(''), 5000);
+            }
+        } catch (error: any) {
+            setErrorMsg(error.message || 'Failed to execute order');
+            setTimeout(() => setErrorMsg(''), 5000);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -39,6 +66,25 @@ export default function OrderEntryPanel() {
                     <CheckCircle className="w-12 h-12 text-green-500 mb-2" />
                     <h3 className="text-xl font-bold text-white mb-1">Order Executed</h3>
                     <p className="text-slate-300">{successMsg}</p>
+                    {isDemo && (
+                        <span className="mt-2 px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">Demo Mode</span>
+                    )}
+                </div>
+            )}
+
+            {errorMsg && (
+                <div className="absolute inset-0 z-20 bg-slate-900/90 flex flex-col items-center justify-center text-center p-4 animate-in fade-in zoom-in">
+                    <AlertCircle className="w-12 h-12 text-red-500 mb-2" />
+                    <h3 className="text-xl font-bold text-white mb-1">Order Failed</h3>
+                    <p className="text-slate-300">{errorMsg}</p>
+                </div>
+            )}
+
+            {/* Demo Mode Badge */}
+            {isDemo && (
+                <div className="mb-4 px-3 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-center gap-2">
+                    <span className="text-xs font-bold text-yellow-400">📊 Demo Mode</span>
+                    <span className="text-xs text-yellow-300/70">Simulated trades only</span>
                 </div>
             )}
 
@@ -118,7 +164,7 @@ export default function OrderEntryPanel() {
                     <Wallet className="w-4 h-4 text-blue-400" />
                     <div className="flex-1">
                         <p className="text-[10px] text-blue-300 font-bold uppercase">Funding Source</p>
-                        <p className="text-xs text-blue-100">Wallet (₹4.52L Available)</p>
+                        <p className="text-xs text-blue-100">Wallet (₹{walletBalance.toLocaleString()} Available)</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
@@ -129,9 +175,18 @@ export default function OrderEntryPanel() {
 
             <button
                 onClick={handleOrder}
-                className={`w-full py-3 rounded-xl font-bold text-sm shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2 ${side === 'buy' ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-red-600 hover:bg-red-500 text-white'
+                disabled={isLoading}
+                className={`w-full py-3 rounded-xl font-bold text-sm shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${side === 'buy' ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-red-600 hover:bg-red-500 text-white'
                     }`}>
-                {side === 'buy' ? 'Place Buy Order' : 'Place Sell Order'} <ArrowRight className="w-4 h-4" />
+                {isLoading ? (
+                    <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+                    </>
+                ) : (
+                    <>
+                        {side === 'buy' ? 'Place Buy Order' : 'Place Sell Order'} <ArrowRight className="w-4 h-4" />
+                    </>
+                )}
             </button>
         </div>
     );

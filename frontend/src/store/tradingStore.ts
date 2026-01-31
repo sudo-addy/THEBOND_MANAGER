@@ -39,11 +39,19 @@ interface TradeState {
     marketStatus: 'Open' | 'Closed';
     trades: Trade[];
 
+    // Demo mode flag
+    isDemoMode: boolean;
+
+    // Portfolio Data
+    walletBalance: number;
+    fetchPortfolio: () => Promise<void>;
+
     // Actions
     selectBond: (bondId: string) => void;
-    executeOrder: (side: 'buy' | 'sell', qty: number, price: number) => void;
+    executeOrder: (side: 'buy' | 'sell', qty: number, price: number) => Promise<{ success: boolean; message?: string }>;
     simulateMarket: () => () => void;
     fetchBonds: () => Promise<void>;
+    checkDemoMode: () => boolean;
 }
 
 import { api } from '@/services/api';
@@ -57,7 +65,10 @@ const BONDS_DATA: Bond[] = [
         price: 1042.50,
         yield: 9.8,
         vol: '12.5Cr',
-        tvSymbol: 'BSE:SENSEX' // Proxy
+        tvSymbol: 'BSE:SENSEX',
+        risk_category: 'low',
+        coupon_rate: 9.8,
+        maturity_date: '2029-03-31'
     },
     {
         id: '2',
@@ -67,7 +78,10 @@ const BONDS_DATA: Bond[] = [
         price: 1150.25,
         yield: 7.4,
         vol: '45.2Cr',
-        tvSymbol: 'NSE:IRFC' // Real stock symbol which is close enough contextually
+        tvSymbol: 'NSE:IRFC',
+        risk_category: 'low',
+        coupon_rate: 7.4,
+        maturity_date: '2030-10-15'
     },
     {
         id: '3',
@@ -77,7 +91,10 @@ const BONDS_DATA: Bond[] = [
         price: 998.00,
         yield: 8.85,
         vol: '5.1Cr',
-        tvSymbol: 'NSE:HDFCBANK'
+        tvSymbol: 'NSE:HDFCBANK',
+        risk_category: 'medium',
+        coupon_rate: 8.85,
+        maturity_date: '2026-12-31'
     },
     {
         id: '4',
@@ -87,13 +104,16 @@ const BONDS_DATA: Bond[] = [
         price: 6250.00,
         yield: 2.5,
         vol: '120Cr',
-        tvSymbol: 'MCX:GOLD' // Gold Futures
+        tvSymbol: 'MCX:GOLD',
+        risk_category: 'low',
+        coupon_rate: 2.5,
+        maturity_date: '2028-02-28'
     }
 ];
 
 export const useTradingStore = create<TradeState>((set, get) => ({
     // Initial State
-    availableBonds: [],
+    availableBonds: BONDS_DATA,
     selectedBond: null as any,
     currentPrice: 0,
     priceChange: 2.4,
@@ -103,6 +123,38 @@ export const useTradingStore = create<TradeState>((set, get) => ({
     },
     marketStatus: 'Open',
     trades: [],
+    isDemoMode: true,
+    walletBalance: 0,
+
+    fetchPortfolio: async () => {
+        try {
+            const response = await api.portfolio.get();
+            if (response.success && response.portfolio) {
+                set({ walletBalance: response.portfolio.virtual_balance });
+            }
+        } catch (error) {
+            console.error('Failed to fetch portfolio:', error);
+        }
+    },
+
+    checkDemoMode: () => {
+        if (typeof window === 'undefined') return true;
+        const user = localStorage.getItem('user');
+        if (!user) return true;
+        try {
+            const userData = JSON.parse(user);
+            // Demo mode if email contains 'demo' or role is 'demo'
+            const isDemo = userData.email?.includes('demo') ||
+                userData.role === 'demo' ||
+                userData.email === 'retail@bondplatform.demo' ||
+                userData.email === 'institutional@bondplatform.demo' ||
+                userData.email === 'admin@bondplatform.demo';
+            set({ isDemoMode: isDemo });
+            return isDemo;
+        } catch (e) {
+            return true;
+        }
+    },
 
     selectBond: (bondId) => {
         const bond = get().availableBonds.find(b => b.id === bondId);
@@ -118,34 +170,89 @@ export const useTradingStore = create<TradeState>((set, get) => ({
         }
     },
 
-    executeOrder: (side, qty, orderPrice) => set((state) => {
-        const totalValue = qty * orderPrice;
-        let newPosition = { ...state.activePosition };
+    executeOrder: async (side, qty, orderPrice) => {
+        const { selectedBond, activePosition, trades } = get();
 
-        if (side === 'buy') {
-            const currentTotalVal = newPosition.qty * newPosition.avgPrice;
-            const newTotalVal = currentTotalVal + totalValue;
-            const newQty = newPosition.qty + qty;
-            newPosition = {
-                qty: newQty,
-                avgPrice: newTotalVal / newQty
-            };
+        // Check demo mode
+        get().checkDemoMode();
+
+        if (!get().isDemoMode && selectedBond) {
+            // Real API call for non-demo users
+            try {
+                if (side === 'buy') {
+                    const response = await api.trading.buy({
+                        bond_id: selectedBond.id,
+                        quantity: qty,
+                        price_per_unit: orderPrice
+                    });
+
+                    if (response.success) {
+                        // Update local state on success
+                        const totalValue = qty * orderPrice;
+                        const currentTotalVal = activePosition.qty * activePosition.avgPrice;
+                        const newTotalVal = currentTotalVal + totalValue;
+                        const newQty = activePosition.qty + qty;
+
+                        const newTrade: Trade = {
+                            price: orderPrice,
+                            qty,
+                            time: new Date().toLocaleTimeString(),
+                            side
+                        };
+
+                        set({
+                            activePosition: {
+                                qty: newQty,
+                                avgPrice: newTotalVal / newQty
+                            },
+                            trades: [newTrade, ...trades].slice(0, 50)
+                        });
+
+                        await get().fetchPortfolio(); // Refresh balance
+                        return { success: true, message: 'Order executed successfully!' };
+                    } else {
+                        return { success: false, message: response.error || 'Order failed' };
+                    }
+                } else {
+                    // Sell order - would need a sell endpoint
+                    return { success: false, message: 'Sell orders require additional verification' };
+                }
+            } catch (error: any) {
+                console.error('Trade execution error:', error);
+                return { success: false, message: error.message || 'Failed to execute order' };
+            }
         } else {
-            newPosition.qty = Math.max(0, newPosition.qty - qty);
+            // Demo mode - simulate locally
+            const totalValue = qty * orderPrice;
+            let newPosition = { ...activePosition };
+
+            if (side === 'buy') {
+                const currentTotalVal = newPosition.qty * newPosition.avgPrice;
+                const newTotalVal = currentTotalVal + totalValue;
+                const newQty = newPosition.qty + qty;
+                newPosition = {
+                    qty: newQty,
+                    avgPrice: newTotalVal / newQty
+                };
+            } else {
+                newPosition.qty = Math.max(0, newPosition.qty - qty);
+            }
+
+            const newTrade: Trade = {
+                price: orderPrice,
+                qty,
+                time: new Date().toLocaleTimeString(),
+                side
+            };
+
+            set({
+                activePosition: newPosition,
+                trades: [newTrade, ...trades].slice(0, 50)
+            });
+
+            return { success: true, message: 'Demo order executed!' };
         }
-
-        const newTrade: Trade = {
-            price: orderPrice,
-            qty,
-            time: new Date().toLocaleTimeString(),
-            side
-        };
-
-        return {
-            activePosition: newPosition,
-            trades: [newTrade, ...state.trades].slice(0, 50)
-        };
-    }),
+    },
 
     simulateMarket: () => {
         const interval = setInterval(() => {
@@ -182,7 +289,7 @@ export const useTradingStore = create<TradeState>((set, get) => ({
     fetchBonds: async () => {
         try {
             const response = await api.bonds.list({ limit: 100 });
-            const bonds = response.success ? response.data.bonds : [];
+            const bonds = response.success ? response.data?.bonds || [] : [];
 
             if (bonds.length > 0) {
                 const formattedBonds = bonds.map((b: any) => ({

@@ -6,7 +6,7 @@ export default function SmartAlerts() {
     const alerts = [
         { id: 1, type: 'payout', msg: 'Coupon Payout of ₹2,400 received for Mumbai Metro Bond.', date: 'Today', priority: 'high' },
         { id: 2, type: 'warning', msg: 'Adani Ports bond downgraded to AA+ rating.', date: 'Yesterday', priority: 'medium' },
-        { id: 3, type: 'milestone', msg: 'You reached ₹5L portfolio value! 🎉', date: 'Jan 28', priority: 'low' },
+        { id: 3, type: 'milestone', msg: 'You reached ₹5L portfolio value!', date: 'Jan 28', priority: 'low' },
     ];
 
     return (
@@ -22,7 +22,7 @@ export default function SmartAlerts() {
                 {alerts.map(alert => (
                     <div key={alert.id} className="p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors flex gap-3">
                         <div className={`mt-0.5 shrink-0 ${alert.type === 'payout' ? 'text-green-400' :
-                                alert.type === 'warning' ? 'text-red-400' : 'text-blue-400'
+                            alert.type === 'warning' ? 'text-red-400' : 'text-blue-400'
                             }`}>
                             {alert.type === 'payout' ? <CheckCircle className="w-4 h-4" /> :
                                 alert.type === 'warning' ? <AlertTriangle className="w-4 h-4" /> :

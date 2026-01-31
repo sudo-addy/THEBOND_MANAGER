@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, AlertTriangle, TrendingUp, Info, Loader2 } from 'lucide-react';
+import { Sparkles, TrendingUp, Info, Loader2 } from 'lucide-react';
 import { useTradingStore } from '@/store/tradingStore';
 import { api } from '@/services/api';
 
@@ -18,7 +18,7 @@ export default function AITradingCoach() {
                 // For hackathon "Wow" factor, we fetch on selection
                 const response = await api.ai.analyze(selectedBond.id);
                 if (response.success) {
-                    setAnalysis(response.data);
+                    setAnalysis(response.analytics);
                 }
             } catch (err) {
                 console.error("AI Fetch Failed", err);

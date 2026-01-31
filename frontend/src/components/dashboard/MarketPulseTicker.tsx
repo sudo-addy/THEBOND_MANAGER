@@ -1,7 +1,7 @@
 'use client';
 
-import { TrendingUp, TrendingDown, Activity, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown, Globe } from 'lucide-react';
+// import { motion } from 'framer-motion';
 
 export default function MarketPulseTicker() {
     const items = [

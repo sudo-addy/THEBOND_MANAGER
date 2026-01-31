@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, TrendingUp, Clock, Target } from 'lucide-react';
+import { ArrowRight, TrendingUp, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 export function FeaturedProjects() {
@@ -64,7 +64,7 @@ export function FeaturedProjects() {
                     {projects.map((project) => (
                         <div key={project.id} className="group relative bg-white/50 dark:bg-slate-900/50 backdrop-blur-lg border border-slate-200 dark:border-slate-800 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-900/20 transition duration-500 hover:-translate-y-1">
                             <div className="absolute top-6 right-6">
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
                   ${project.color === 'green' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                                         project.color === 'blue' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
                                             'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
